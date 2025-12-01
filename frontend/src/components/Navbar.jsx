@@ -30,6 +30,7 @@ import {
   Search,
   NotificationsNone,
   Menu as MenuIcon,
+  Info,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
@@ -58,6 +59,7 @@ const Navbar = () => {
     { label: 'Sentiment', path: '/sentiment', icon: <SentimentIcon fontSize="small" /> },
     { label: 'Topics', path: '/topics', icon: <TopicIcon fontSize="small" /> },
     { label: 'Trends', path: '/trends', icon: <TrendsIcon fontSize="small" /> },
+    { label: 'About', path: '/about', icon: <Info fontSize="small" /> },
   ]
 
   const handleMenuOpen = (event) => {

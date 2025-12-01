@@ -153,12 +153,17 @@ def login():
             expires_delta=access_token_expires
         )
         
+        # Extract surname from name
+        from auth import extract_surname
+        surname = extract_surname(user.get('name', ''))
+        
         response_data = {
             'token': access_token,
             'user': {
                 'id': user['id'],
                 'email': user['email'],
                 'name': user['name'],
+                'surname': surname,
                 'role': user['role'],
             },
             'message': 'Login successful'
@@ -899,13 +904,20 @@ def get_notifications():
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         user_info = {}
         try:
-            from auth import verify_token
+            from auth import verify_token, find_user_by_email
             decoded = verify_token(token)
-            user_info = decoded if decoded else {}
+            if decoded:
+                user_info = decoded
+                # Get full user data to extract surname
+                user_email = decoded.get('sub') or decoded.get('email', 'unknown')
+                full_user = find_user_by_email(user_email)
+                if full_user:
+                    from auth import extract_surname
+                    user_info['surname'] = extract_surname(full_user.get('name', ''))
         except:
             pass
         
-        user_email = user_info.get('email', 'unknown')
+        user_email = user_info.get('sub') or user_info.get('email', 'unknown')
         
         # Get notifications for this user (or all if admin)
         user_notifications = [
@@ -916,18 +928,20 @@ def get_notifications():
         # Sort by timestamp (newest first)
         user_notifications.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         
-        # If no notifications, return some default ones
+        # If no notifications, create welcome notification with user surname
         if not user_notifications:
-            user_notifications = [
-                {
-                    'id': 1,
-                    'type': 'info',
-                    'title': 'Welcome to CENAnalytics',
-                    'message': 'Your analytics dashboard is ready. Start exploring your data insights.',
-                    'timestamp': datetime.now().isoformat(),
-                    'read': False
-                }
-            ]
+            user_surname = user_info.get('surname', 'User')
+            welcome_notification = {
+                'id': len(notifications_storage) + 1,
+                'type': 'info',
+                'title': f'Welcome to CENAnalytics, {user_surname}!',
+                'message': f'Your analytics dashboard is ready, {user_surname}. Start exploring your data insights and discover valuable business intelligence.',
+                'timestamp': datetime.now().isoformat(),
+                'read': False,
+                'user_email': user_email
+            }
+            notifications_storage.append(welcome_notification)
+            user_notifications = [welcome_notification]
         
         return jsonify({'notifications': user_notifications})
     except Exception as e:
@@ -939,15 +953,38 @@ def get_notifications():
 def mark_notification_read():
     """Mark a notification as read"""
     try:
-        data = request.json
+        data = request.get_json() or {}
         notification_id = data.get('id')
         
+        if not notification_id:
+            return jsonify({'error': 'Notification ID required'}), 400
+        
+        # Get user info from token
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        user_info = {}
+        try:
+            from auth import verify_token
+            decoded = verify_token(token)
+            user_info = decoded if decoded else {}
+        except:
+            pass
+        
+        user_email = user_info.get('sub') or user_info.get('email', 'unknown')
+        
+        # Find and update notification
+        notification_found = False
         for notification in notifications_storage:
             if notification.get('id') == notification_id:
-                notification['read'] = True
-                break
+                # Check if user owns this notification or is admin
+                if notification.get('user_email') == user_email or user_info.get('role') == 'admin':
+                    notification['read'] = True
+                    notification_found = True
+                    break
         
-        return jsonify({'status': 'success'})
+        if notification_found:
+            return jsonify({'status': 'success', 'message': 'Notification marked as read'})
+        else:
+            return jsonify({'error': 'Notification not found or unauthorized'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

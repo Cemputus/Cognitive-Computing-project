@@ -103,6 +103,14 @@ def find_user_by_email(email: str) -> Optional[Dict]:
     return None
 
 
+def extract_surname(name: str) -> str:
+    """Extract surname (last name) from full name"""
+    if not name:
+        return ''
+    parts = name.strip().split()
+    return parts[-1] if len(parts) > 1 else parts[0] if parts else ''
+
+
 def authenticate_user(email: str, password: str) -> Optional[Dict]:
     """Authenticate a user and return user data if successful"""
     user = find_user_by_email(email)
@@ -112,6 +120,8 @@ def authenticate_user(email: str, password: str) -> Optional[Dict]:
     if verify_password(password, user['password']):
         # Return user data without password
         user_data = {k: v for k, v in user.items() if k != 'password'}
+        # Extract surname from name
+        user_data['surname'] = extract_surname(user_data.get('name', ''))
         return user_data
     
     return None

@@ -24,6 +24,7 @@ import {
   Warning,
   Error as ErrorIcon,
   Close,
+  Done,
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
 import { apiService } from '../services/api'
@@ -184,6 +185,25 @@ const Notifications = () => {
                       </Box>
                     }
                   />
+                  {!notification.read && (
+                    <IconButton
+                      size="small"
+                      onClick={async () => {
+                        try {
+                          await apiService.markNotificationRead(notification.id)
+                          setNotifications(prev =>
+                            prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
+                          )
+                        } catch (err) {
+                          console.error('Error marking notification as read:', err)
+                        }
+                      }}
+                      sx={{ ml: 1, color: 'success.main' }}
+                      title="Mark as read"
+                    >
+                      <Done fontSize="small" />
+                    </IconButton>
+                  )}
                 </ListItem>
                 {index < notifications.length - 1 && <Divider />}
               </motion.div>

@@ -292,31 +292,84 @@ const About = () => {
         </CardContent>
       </Card>
 
+      {/* Use Cases */}
+      <Box mb={6}>
+        <Typography variant="h5" fontWeight={600} gutterBottom mb={3}>
+          Use Cases
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ height: '100%', borderLeft: '4px solid #5624d0' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Small Business Owners
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Understand customer satisfaction, identify service gaps, and make data-driven decisions to improve your business operations in Kampala.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ height: '100%', borderLeft: '4px solid #10b981' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Marketing Teams
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Track brand sentiment across platforms, identify trending topics, and measure campaign effectiveness in real-time.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ height: '100%', borderLeft: '4px solid #f59e0b' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Customer Service
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Proactively address customer concerns, prioritize issues by location and platform, and improve response times.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+
       {/* Contact/Support */}
       <Box mt={6} textAlign="center">
-        <Card sx={{ bgcolor: 'primary.main', color: 'white' }}>
-          <CardContent sx={{ py: 4 }}>
-            <Support sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h5" fontWeight={600} gutterBottom>
-              Need Help?
-            </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9, mb: 3 }}>
-              Our support team is here to help you get the most out of the platform
-            </Typography>
-            <Chip
-              label="Contact Support"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                fontWeight: 600,
-                cursor: 'pointer',
-                '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.3)',
-                },
-              }}
-            />
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card sx={{ bgcolor: 'primary.main', color: 'white' }}>
+            <CardContent sx={{ py: 4 }}>
+              <Support sx={{ fontSize: 48, mb: 2 }} />
+              <Typography variant="h5" fontWeight={600} gutterBottom>
+                Need Help?
+              </Typography>
+              <Typography variant="body1" sx={{ opacity: 0.9, mb: 3 }}>
+                Our support team is here to help you get the most out of CENAnalytics platform
+              </Typography>
+              <Chip
+                label="Contact Support"
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  height: 40,
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.3)',
+                  },
+                }}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
       </Box>
     </Container>
   )

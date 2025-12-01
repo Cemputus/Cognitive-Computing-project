@@ -513,6 +513,7 @@ const Dashboard = () => {
               </Box>
             </Grid>
           </Grid>
+          )}
 
           {locationData?.summary && (
             <Box mt={2}>
@@ -769,26 +770,6 @@ const Dashboard = () => {
                 <Typography variant="body2" color="text.secondary" mt={1}>
                   <strong>Distribution:</strong> Showing what percentage of all {topicFilter} reviews come from each topic.
                 </Typography>
-              )}
-            </Box>
-          )}
-            <Box mt={2} display="flex" gap={2} flexWrap="wrap">
-              <Chip
-                label={`Total Topics: ${topicData.summary.total_topics}`}
-                color="primary"
-                variant="outlined"
-              />
-              <Chip
-                label={`Total Reviews: ${topicData.summary.total_reviews.toLocaleString()}`}
-                color="primary"
-                variant="outlined"
-              />
-              {topicFilter !== 'all' && (
-                <Chip
-                  label={`Filter: ${topicFilter}`}
-                  color="secondary"
-                  variant="outlined"
-                />
               )}
             </Box>
           )}
