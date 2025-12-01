@@ -8,7 +8,14 @@ import numpy as np
 import re
 from textblob import TextBlob
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from transformers import pipeline
+
+# Optional import for transformer-based sentiment analysis
+try:
+    from transformers import pipeline
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    pipeline = None
 
 
 class SentimentAnalyzer:
@@ -36,7 +43,7 @@ class SentimentAnalyzer:
         self.textblob_available = True  # TextBlob doesn't need initialization
         
         self.transformer_available = False
-        if method == 'transformer' or use_ensemble:
+        if (method == 'transformer' or use_ensemble) and TRANSFORMERS_AVAILABLE:
             try:
                 self.transformer_analyzer = pipeline("sentiment-analysis", 
                                         model="nlptown/bert-base-multilingual-uncased-sentiment")
@@ -44,6 +51,9 @@ class SentimentAnalyzer:
             except Exception as e:
                 print(f"⚠️ Transformer model not available: {e}")
                 self.transformer_available = False
+        elif (method == 'transformer' or use_ensemble) and not TRANSFORMERS_AVAILABLE:
+            print("⚠️ Transformers library not installed. Transformer-based sentiment analysis will be disabled.")
+            self.transformer_available = False
         
         # Sarcasm detection patterns
         self.sarcasm_patterns = [
@@ -273,6 +283,13 @@ class SentimentAnalyzer:
                 'sentiment': 'neutral',
                 'confidence': 0.0,
                 'warning': 'Empty text input'
+            }
+        
+        if not self.transformer_available or not hasattr(self, 'transformer_analyzer'):
+            return {
+                'sentiment': 'neutral',
+                'confidence': 0.0,
+                'warning': 'Transformer model not available'
             }
         
         try:
