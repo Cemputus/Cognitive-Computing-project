@@ -249,22 +249,23 @@ const Dashboard = () => {
 
   // Prepare platform chart data with percentage distribution
   // When filter is applied, show percentage of all filtered sentiment from each platform
-  const platformChartData = platformData?.platforms?.map((plat) => {
+  const platformChartData = (platformData?.platforms || []).map((plat) => {
     if (platformFilter !== 'all') {
-      const pctKey = `pctOfAll${platformFilter.charAt(0).toUpperCase() + platformFilter.slice(1)}`
+      // Use snake_case from backend response
+      const pctKey = `pct_of_all_${platformFilter}`
+      const value = plat[pctKey] || 0
       return {
         name: plat.platform,
-        Value: plat[pctKey] || 0,
-        Total: plat.total,
-        [platformFilter.charAt(0).toUpperCase() + platformFilter.slice(1)]: plat[pctKey] || 0,
+        Value: value,
+        Total: plat.total || 0,
       }
     }
     return {
       name: plat.platform,
-      Positive: plat.positive_pct,
-      Negative: plat.negative_pct,
-      Neutral: plat.neutral_pct,
-      Total: plat.total,
+      Positive: plat.positive_pct || 0,
+      Negative: plat.negative_pct || 0,
+      Neutral: plat.neutral_pct || 0,
+      Total: plat.total || 0,
       pctOfAllPositive: plat.pct_of_all_positive || 0,
       pctOfAllNegative: plat.pct_of_all_negative || 0,
       pctOfAllNeutral: plat.pct_of_all_neutral || 0,
@@ -274,7 +275,7 @@ const Dashboard = () => {
       return item.name.toLowerCase().includes(searchQuery.toLowerCase())
     }
     return true
-  }) || []
+  })
 
   // Prepare topic chart data with meaningful names
   // When filter is applied, show percentage of all filtered sentiment from each topic
