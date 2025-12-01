@@ -115,6 +115,8 @@ const Dashboard = () => {
   const fetchLocationData = async () => {
     try {
       const data = await apiService.getLocationSentiment(locationFilter)
+      console.log('Location data:', data)
+      console.log('Location filter:', locationFilter)
       setLocationData(data)
     } catch (err) {
       console.error('Error fetching location data:', err)
@@ -223,22 +225,22 @@ const Dashboard = () => {
     if (locationFilter !== 'all') {
       // Use snake_case from backend response
       const pctKey = `pct_of_all_${locationFilter}`
-      const value = loc[pctKey] || 0
+      const value = loc[pctKey] !== undefined ? Number(loc[pctKey]) : 0
       return {
-        name: loc.location,
+        name: loc.location || 'Unknown',
         Value: value,
-        Total: loc.total || 0,
+        Total: Number(loc.total) || 0,
       }
     }
     return {
-      name: loc.location,
-      Positive: loc.positive_pct || 0,
-      Negative: loc.negative_pct || 0,
-      Neutral: loc.neutral_pct || 0,
-      Total: loc.total || 0,
-      pctOfAllPositive: loc.pct_of_all_positive || 0,
-      pctOfAllNegative: loc.pct_of_all_negative || 0,
-      pctOfAllNeutral: loc.pct_of_all_neutral || 0,
+      name: loc.location || 'Unknown',
+      Positive: Number(loc.positive_pct) || 0,
+      Negative: Number(loc.negative_pct) || 0,
+      Neutral: Number(loc.neutral_pct) || 0,
+      Total: Number(loc.total) || 0,
+      pctOfAllPositive: Number(loc.pct_of_all_positive) || 0,
+      pctOfAllNegative: Number(loc.pct_of_all_negative) || 0,
+      pctOfAllNeutral: Number(loc.pct_of_all_neutral) || 0,
     }
   }).filter(item => {
     if (searchQuery) {
@@ -246,6 +248,8 @@ const Dashboard = () => {
     }
     return true
   })
+  
+  console.log('Location chart data prepared:', locationChartData.length, 'items, filter:', locationFilter)
 
   // Prepare platform chart data with percentage distribution
   // When filter is applied, show percentage of all filtered sentiment from each platform
@@ -253,22 +257,22 @@ const Dashboard = () => {
     if (platformFilter !== 'all') {
       // Use snake_case from backend response
       const pctKey = `pct_of_all_${platformFilter}`
-      const value = plat[pctKey] || 0
+      const value = plat[pctKey] !== undefined ? Number(plat[pctKey]) : 0
       return {
-        name: plat.platform,
+        name: plat.platform || 'Unknown',
         Value: value,
-        Total: plat.total || 0,
+        Total: Number(plat.total) || 0,
       }
     }
     return {
-      name: plat.platform,
-      Positive: plat.positive_pct || 0,
-      Negative: plat.negative_pct || 0,
-      Neutral: plat.neutral_pct || 0,
-      Total: plat.total || 0,
-      pctOfAllPositive: plat.pct_of_all_positive || 0,
-      pctOfAllNegative: plat.pct_of_all_negative || 0,
-      pctOfAllNeutral: plat.pct_of_all_neutral || 0,
+      name: plat.platform || 'Unknown',
+      Positive: Number(plat.positive_pct) || 0,
+      Negative: Number(plat.negative_pct) || 0,
+      Neutral: Number(plat.neutral_pct) || 0,
+      Total: Number(plat.total) || 0,
+      pctOfAllPositive: Number(plat.pct_of_all_positive) || 0,
+      pctOfAllNegative: Number(plat.pct_of_all_negative) || 0,
+      pctOfAllNeutral: Number(plat.pct_of_all_neutral) || 0,
     }
   }).filter(item => {
     if (searchQuery) {
@@ -279,33 +283,34 @@ const Dashboard = () => {
 
   // Prepare topic chart data with meaningful names
   // When filter is applied, show percentage of all filtered sentiment from each topic
-  const topicChartData = topicData?.topics?.map((topic) => {
+  const topicChartData = (topicData?.topics || []).map((topic) => {
     const topicName = topic.topic_name || `Topic ${topic.topic}`
     if (topicFilter !== 'all') {
-      const pctKey = `pctOfAll${topicFilter.charAt(0).toUpperCase() + topicFilter.slice(1)}`
+      // Use snake_case from backend response
+      const pctKey = `pct_of_all_${topicFilter}`
+      const value = topic[pctKey] !== undefined ? Number(topic[pctKey]) : 0
       return {
         name: topicName,
-        Value: topic[pctKey] || 0,
-        Total: topic.total,
-        [topicFilter.charAt(0).toUpperCase() + topicFilter.slice(1)]: topic[pctKey] || 0,
+        Value: value,
+        Total: Number(topic.total) || 0,
       }
     }
     return {
       name: topicName,
-      Positive: topic.positive_pct,
-      Negative: topic.negative_pct,
-      Neutral: topic.neutral_pct,
-      Total: topic.total,
-      pctOfAllPositive: topic.pct_of_all_positive || 0,
-      pctOfAllNegative: topic.pct_of_all_negative || 0,
-      pctOfAllNeutral: topic.pct_of_all_neutral || 0,
+      Positive: Number(topic.positive_pct) || 0,
+      Negative: Number(topic.negative_pct) || 0,
+      Neutral: Number(topic.neutral_pct) || 0,
+      Total: Number(topic.total) || 0,
+      pctOfAllPositive: Number(topic.pct_of_all_positive) || 0,
+      pctOfAllNegative: Number(topic.pct_of_all_negative) || 0,
+      pctOfAllNeutral: Number(topic.pct_of_all_neutral) || 0,
     }
   }).filter(item => {
     if (searchQuery) {
       return item.name.toLowerCase().includes(searchQuery.toLowerCase())
     }
     return true
-  }) || []
+  })
 
   // Location pie chart data
   const locationPieData = locationData?.locations?.slice(0, 5).map((loc) => ({
@@ -431,6 +436,13 @@ const Dashboard = () => {
             </FormControl>
           </Box>
 
+          {locationChartData.length === 0 ? (
+            <Box p={4} textAlign="center">
+              <Typography variant="body1" color="text.secondary">
+                No data available for the selected filter. Try selecting a different sentiment or check back later.
+              </Typography>
+            </Box>
+          ) : (
           <Grid container spacing={3}>
             <Grid item xs={12} md={8}>
               <Box height={400}>
@@ -453,13 +465,9 @@ const Dashboard = () => {
                       }}
                       formatter={(value, name, props) => {
                         if (locationFilter !== 'all') {
-                          const data = props.payload
-                          if (data) {
-                            const pctKey = `pctOfAll${locationFilter.charAt(0).toUpperCase() + locationFilter.slice(1)}`
-                            return [`${value}% (${data[pctKey] || 0}% of all ${locationFilter})`, name]
-                          }
+                          return [`${typeof value === 'number' ? value.toFixed(1) : value}% of all ${locationFilter} reviews`, name]
                         }
-                        return [value + '%', name]
+                        return [typeof value === 'number' ? value.toFixed(1) + '%' : value + '%', name]
                       }}
                     />
                     <Legend />
@@ -584,13 +592,9 @@ const Dashboard = () => {
                       }}
                       formatter={(value, name, props) => {
                         if (platformFilter !== 'all') {
-                          const data = props.payload
-                          if (data) {
-                            const pctKey = `pctOfAll${platformFilter.charAt(0).toUpperCase() + platformFilter.slice(1)}`
-                            return [`${value}% (${data[pctKey] || 0}% of all ${platformFilter})`, name]
-                          }
+                          return [`${typeof value === 'number' ? value.toFixed(1) : value}% of all ${platformFilter} reviews`, name]
                         }
-                        return [value + '%', name]
+                        return [typeof value === 'number' ? value.toFixed(1) + '%' : value + '%', name]
                       }}
                     />
                     <Legend />
@@ -716,13 +720,9 @@ const Dashboard = () => {
                   }}
                   formatter={(value, name, props) => {
                     if (topicFilter !== 'all') {
-                      const data = props.payload
-                      if (data) {
-                        const pctKey = `pctOfAll${topicFilter.charAt(0).toUpperCase() + topicFilter.slice(1)}`
-                        return [`${value}% (${data[pctKey] || 0}% of all ${topicFilter})`, name]
-                      }
+                      return [`${typeof value === 'number' ? value.toFixed(1) : value}% of all ${topicFilter} reviews`, name]
                     }
-                    return [value + '%', name]
+                    return [typeof value === 'number' ? value.toFixed(1) + '%' : value + '%', name]
                   }}
                 />
                 <Legend />
