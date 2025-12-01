@@ -9,22 +9,26 @@ print("=" * 60)
 print("Dataset Location Verification")
 print("=" * 60)
 
-# Define paths
-relative_path = 'data/raw/collected_reviews.csv'
+# Define paths (script is in backend/scripts/)
+backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+relative_path = os.path.join(backend_dir, 'data', 'raw', 'collected_reviews.csv')
 absolute_path = os.path.abspath(relative_path)
-project_root = os.path.abspath('.')
+project_root = os.path.dirname(backend_dir)
 
 print(f"\n📍 Dataset Location:")
-print(f"   Relative path: {relative_path}")
+print(f"   Relative path: backend/data/raw/collected_reviews.csv")
 print(f"   Absolute path: {absolute_path}")
 print(f"\n📂 Project Structure:")
 print(f"   Project root: {project_root}")
-print(f"   Data directory: {os.path.abspath('data')}")
-print(f"   Raw directory: {os.path.abspath('data/raw')}")
+print(f"   Backend directory: {backend_dir}")
+print(f"   Data directory: {os.path.join(backend_dir, 'data')}")
+print(f"   Raw directory: {os.path.join(backend_dir, 'data', 'raw')}")
 
 print(f"\n✅ Directory Status:")
-print(f"   data/ directory exists: {os.path.exists('data')}")
-print(f"   data/raw/ directory exists: {os.path.exists('data/raw')}")
+data_dir = os.path.join(backend_dir, 'data')
+raw_dir = os.path.join(backend_dir, 'data', 'raw')
+print(f"   backend/data/ directory exists: {os.path.exists(data_dir)}")
+print(f"   backend/data/raw/ directory exists: {os.path.exists(raw_dir)}")
 print(f"   Dataset file exists: {os.path.exists(relative_path)}")
 
 if os.path.exists(relative_path):

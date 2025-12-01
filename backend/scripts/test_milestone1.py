@@ -6,8 +6,9 @@ Run this before opening the notebook to ensure everything is ready
 import sys
 import os
 
-# Add project root to path
-sys.path.append('.')
+# Add backend directory to path (scripts are in backend/scripts/)
+backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, backend_dir)
 
 print("=" * 60)
 print("Testing Milestone 1 Components")
@@ -70,32 +71,35 @@ except Exception as e:
 
 # Test 5: Check directories
 print("\n5. Checking directories...")
+project_root = os.path.dirname(backend_dir)
 directories = [
-    'data/raw',
-    'data/processed',
-    'data/models',
-    'notebooks/Milestone1'
+    os.path.join(backend_dir, 'data', 'raw'),
+    os.path.join(backend_dir, 'data', 'processed'),
+    os.path.join(backend_dir, 'data', 'models'),
+    os.path.join(project_root, 'Cognitive Pillars', 'Milestone1')
 ]
 for directory in directories:
+    rel_path = os.path.relpath(directory, project_root)
     if os.path.exists(directory):
-        print(f"   ✅ {directory} exists")
+        print(f"   ✅ {rel_path} exists")
     else:
-        print(f"   ⚠️  {directory} NOT found - creating it")
+        print(f"   ⚠️  {rel_path} NOT found - creating it")
         os.makedirs(directory, exist_ok=True)
 
 # Test 6: Check notebook file
 print("\n6. Checking notebook file...")
-notebook_path = 'notebooks/Milestone1/01_Data_Pipeline.ipynb'
+notebook_path = os.path.join(project_root, 'Cognitive Pillars', 'Milestone1', '01_Data_Pipeline.ipynb')
+notebook_rel = os.path.relpath(notebook_path, project_root)
 if os.path.exists(notebook_path):
-    print(f"   ✅ Notebook found: {notebook_path}")
+    print(f"   ✅ Notebook found: {notebook_rel}")
 else:
-    print(f"   ❌ Notebook NOT found: {notebook_path}")
+    print(f"   ❌ Notebook NOT found: {notebook_rel}")
 
 print("\n" + "=" * 60)
 print("✅ All tests passed! Ready to start Milestone 1")
 print("=" * 60)
 print("\nNext step: Open the notebook with:")
-print("  jupyter notebook notebooks/Milestone1/01_Data_Pipeline.ipynb")
+print("  jupyter notebook Cognitive Pillars/Milestone1/01_Data_Pipeline.ipynb")
 print("\nOr use:")
 print("  jupyter lab")
 

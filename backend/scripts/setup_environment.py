@@ -39,16 +39,18 @@ def download_nltk_data():
 
 def create_directories():
     """Create necessary directories"""
+    # Get backend directory (parent of scripts/)
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     directories = [
-        'data/raw',
-        'data/processed',
-        'data/models',
-        'evaluation'
+        os.path.join(backend_dir, 'data', 'raw'),
+        os.path.join(backend_dir, 'data', 'processed'),
+        os.path.join(backend_dir, 'data', 'models'),
     ]
     
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
-        print(f"✅ Directory created/verified: {directory}")
+        rel_path = os.path.relpath(directory, backend_dir)
+        print(f"✅ Directory created/verified: {rel_path}")
 
 def main():
     print("=" * 60)
@@ -98,23 +100,25 @@ def main():
     
     # Verify source modules
     print("\n4. Verifying source modules...")
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     source_files = [
-        'src/utils/text_preprocessor.py',
-        'src/models/sentiment_analyzer.py'
+        os.path.join(backend_dir, 'src', 'utils', 'text_preprocessor.py'),
+        os.path.join(backend_dir, 'src', 'models', 'sentiment_analyzer.py')
     ]
     
     for file_path in source_files:
+        rel_path = os.path.relpath(file_path, backend_dir)
         if os.path.exists(file_path):
-            print(f"   ✅ {file_path} exists")
+            print(f"   ✅ {rel_path} exists")
         else:
-            print(f"   ⚠️  {file_path} NOT found")
+            print(f"   ⚠️  {rel_path} NOT found")
     
     print("\n" + "=" * 60)
     print("Setup complete! You can now start Milestone 1 notebook.")
     print("=" * 60)
     print("\nNext steps:")
     print("1. Open Jupyter Notebook: jupyter notebook")
-    print("2. Navigate to: notebooks/Milestone1/")
+    print("2. Navigate to: Cognitive Pillars/Milestone1/")
     print("3. Open: 01_Data_Pipeline.ipynb")
     print("4. Run all cells sequentially")
 

@@ -30,10 +30,17 @@ const TrendsInsights = () => {
   useEffect(() => {
     const fetchForecast = async () => {
       try {
+        setLoading(true)
         const data = await apiService.getForecast()
-        setForecast(data)
+        if (data && (data.forecast_dates || data.forecast)) {
+          setForecast(data)
+          setError(null)
+        } else {
+          setError('Forecast data not available. Please run the predictive modeling notebook.')
+        }
       } catch (err) {
-        setError(err.message || 'Failed to load forecast data')
+        console.error('Forecast error:', err)
+        setError(err.message || 'Failed to load forecast data. Please ensure the backend is running and forecast data exists.')
       } finally {
         setLoading(false)
       }
@@ -51,12 +58,12 @@ const TrendsInsights = () => {
     )
   }
 
-  const chartData = forecast
+  const chartData = forecast && forecast.forecast_dates
     ? forecast.forecast_dates.map((date, idx) => ({
         date: new Date(date).toLocaleDateString(),
-        ma_forecast: forecast.ma_forecast[idx],
-        trend_forecast: forecast.trend_forecast?.[idx],
-        arima_forecast: forecast.arima_forecast?.[idx],
+        ma_forecast: forecast.ma_forecast?.[idx] || 0,
+        trend_forecast: forecast.trend_forecast?.[idx] || 0,
+        arima_forecast: forecast.arima_forecast?.[idx] || 0,
       }))
     : []
 
@@ -137,15 +144,21 @@ const TrendsInsights = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card
+              sx={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #5624d015 0%, #5624d005 100%)',
+                border: '1px solid #5624d030',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom fontWeight={600}>
                   Current Status
                 </Typography>
-                <Typography variant="h4" color="primary">
-                  {(forecast.current_sentiment * 100).toFixed(1)}%
+                <Typography variant="h3" color="primary" fontWeight={700}>
+                  {forecast.current_sentiment ? (forecast.current_sentiment * 100).toFixed(1) : '0.0'}%
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                   Current positive sentiment ratio
                 </Typography>
               </CardContent>
@@ -153,15 +166,21 @@ const TrendsInsights = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card
+              sx={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #10b98115 0%, #10b98105 100%)',
+                border: '1px solid #10b98130',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom fontWeight={600}>
                   Forecasted Average
                 </Typography>
-                <Typography variant="h4" color="secondary">
-                  {(forecast.forecast_avg * 100).toFixed(1)}%
+                <Typography variant="h3" color="success.main" fontWeight={700}>
+                  {forecast.forecast_avg ? (forecast.forecast_avg * 100).toFixed(1) : '0.0'}%
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                   Predicted positive sentiment ratio (next 7 days)
                 </Typography>
               </CardContent>
@@ -169,10 +188,21 @@ const TrendsInsights = () => {
           </Grid>
         </Grid>
       )}
+
+      {!forecast && !loading && !error && (
+        <Card>
+          <CardContent>
+            <Typography variant="body1" color="text.secondary" textAlign="center" py={4}>
+              Forecast data not available. Run Milestone 2 notebook to generate forecast results.
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
     </Container>
   )
 }
 
 export default TrendsInsights
+
 
 

@@ -14,6 +14,10 @@ import {
   Link,
   Divider,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material'
 import {
   Email,
@@ -22,10 +26,12 @@ import {
   VisibilityOff,
   Business,
   Login as LoginIcon,
+  Send,
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
 import { FaBrain } from 'react-icons/fa'
 import { useAuth } from '../contexts/AuthContext'
+import { apiService } from '../services/api'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -33,6 +39,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [contactDialogOpen, setContactDialogOpen] = useState(false)
+  const [contactName, setContactName] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactSubject, setContactSubject] = useState('')
+  const [contactMessage, setContactMessage] = useState('')
+  const [contactLoading, setContactLoading] = useState(false)
+  const [contactSuccess, setContactSuccess] = useState(false)
   const navigate = useNavigate()
   const theme = useTheme()
   const { login } = useAuth()
@@ -43,13 +56,14 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const success = await login(email, password)
+      const success = await login(email.trim(), password)
       if (success) {
         navigate('/dashboard')
       } else {
         setError('Invalid email or password')
       }
     } catch (err) {
+      console.error('Login error in component:', err)
       setError(err.message || 'Login failed. Please try again.')
     } finally {
       setLoading(false)
@@ -75,10 +89,10 @@ const Login = () => {
         >
           <Card
             sx={{
-              borderRadius: 4,
-              boxShadow: 24,
+              borderRadius: 3,
+              boxShadow: 12,
               overflow: 'hidden',
-              maxWidth: 450,
+              maxWidth: 380,
               mx: 'auto',
             }}
           >
@@ -87,7 +101,7 @@ const Login = () => {
               sx={{
                 background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                 color: 'white',
-                p: 3,
+                p: 2,
                 textAlign: 'center',
               }}
             >
@@ -95,23 +109,23 @@ const Login = () => {
                 sx={{
                   display: 'flex',
                   justifyContent: 'center',
-                  mb: 1.5,
-                  fontSize: '2.5rem',
+                  mb: 1,
+                  fontSize: '2rem',
                 }}
               >
                 <FaBrain />
               </Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.25 }}>
                 Welcome Back
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.875rem' }}>
+              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.75rem' }}>
                 Sign in to your dashboard
               </Typography>
             </Box>
 
-            <CardContent sx={{ p: 3 }}>
+            <CardContent sx={{ p: 2.5 }}>
               {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
+                <Alert severity="error" sx={{ mb: 2, py: 0.5, fontSize: '0.875rem' }}>
                   {error}
                 </Alert>
               )}
@@ -125,7 +139,7 @@ const Login = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   size="small"
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.5 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -144,11 +158,11 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   size="small"
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.5 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock color="action" />
+                        <Lock color="action" fontSize="small" />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -156,8 +170,9 @@ const Login = () => {
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
+                          size="small"
                         >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                          {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -165,13 +180,13 @@ const Login = () => {
                   variant="outlined"
                 />
 
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
                   <Link
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
                     }}
-                    sx={{ textDecoration: 'none', fontSize: '0.875rem' }}
+                    sx={{ textDecoration: 'none', fontSize: '0.75rem' }}
                   >
                     Forgot Password?
                   </Link>
@@ -181,14 +196,14 @@ const Login = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  size="medium"
+                  size="small"
                   disabled={loading}
-                  startIcon={<LoginIcon />}
+                  startIcon={<LoginIcon fontSize="small" />}
                   sx={{
-                    py: 1.2,
-                    fontSize: '1rem',
+                    py: 1,
+                    fontSize: '0.875rem',
                     fontWeight: 600,
-                    mb: 2,
+                    mb: 1.5,
                     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                     '&:hover': {
                       background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
@@ -202,13 +217,13 @@ const Login = () => {
                 </Button>
               </form>
 
-              <Divider sx={{ my: 2 }}>
-                <Typography variant="caption" color="text.secondary">
+              <Divider sx={{ my: 1.5 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                   Demo Accounts
                 </Typography>
               </Divider>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mb: 1.5 }}>
                 <Button
                   variant="outlined"
                   fullWidth
@@ -217,8 +232,8 @@ const Login = () => {
                     setEmail('admin@business.com')
                     setPassword('admin123')
                   }}
-                  startIcon={<Business sx={{ fontSize: '1rem' }} />}
-                  sx={{ textTransform: 'none', fontSize: '0.875rem' }}
+                  startIcon={<Business sx={{ fontSize: '0.875rem' }} />}
+                  sx={{ textTransform: 'none', fontSize: '0.75rem', py: 0.75 }}
                 >
                   Use Admin Account
                 </Button>
@@ -230,26 +245,133 @@ const Login = () => {
                     setEmail('user1@business.com')
                     setPassword('user123')
                   }}
-                  sx={{ textTransform: 'none', fontSize: '0.875rem' }}
+                  sx={{ textTransform: 'none', fontSize: '0.75rem', py: 0.75 }}
                 >
                   Use Demo User Account
                 </Button>
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                   Don't have an account?{' '}
                   <Link
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
+                      setContactDialogOpen(true)
                     }}
-                    sx={{ fontWeight: 600, fontSize: '0.875rem' }}
+                    sx={{ fontWeight: 600, fontSize: '0.7rem', cursor: 'pointer' }}
                   >
                     Contact Admin
                   </Link>
                 </Typography>
               </Box>
+
+              {/* Contact Admin Dialog */}
+              <Dialog
+                open={contactDialogOpen}
+                onClose={() => {
+                  setContactDialogOpen(false)
+                  setContactSuccess(false)
+                  setContactName('')
+                  setContactEmail('')
+                  setContactSubject('')
+                  setContactMessage('')
+                }}
+                maxWidth="sm"
+                fullWidth
+              >
+                <DialogTitle>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Email color="primary" />
+                    <Typography variant="h6">Contact Administrator</Typography>
+                  </Box>
+                </DialogTitle>
+                <DialogContent>
+                  {contactSuccess ? (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      Your message has been sent to the administrator. They will get back to you soon.
+                    </Alert>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+                      <TextField
+                        label="Your Name"
+                        fullWidth
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        required
+                      />
+                      <TextField
+                        label="Your Email"
+                        type="email"
+                        fullWidth
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        required
+                      />
+                      <TextField
+                        label="Subject"
+                        fullWidth
+                        value={contactSubject}
+                        onChange={(e) => setContactSubject(e.target.value)}
+                        required
+                      />
+                      <TextField
+                        label="Message"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={contactMessage}
+                        onChange={(e) => setContactMessage(e.target.value)}
+                        required
+                      />
+                    </Box>
+                  )}
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => {
+                      setContactDialogOpen(false)
+                      setContactSuccess(false)
+                      setContactName('')
+                      setContactEmail('')
+                      setContactSubject('')
+                      setContactMessage('')
+                    }}
+                  >
+                    {contactSuccess ? 'Close' : 'Cancel'}
+                  </Button>
+                  {!contactSuccess && (
+                    <Button
+                      onClick={async () => {
+                        if (!contactName || !contactEmail || !contactSubject || !contactMessage) {
+                          setError('Please fill in all fields')
+                          return
+                        }
+                        try {
+                          setContactLoading(true)
+                          await apiService.contactAdmin({
+                            name: contactName,
+                            email: contactEmail,
+                            subject: contactSubject,
+                            message: contactMessage,
+                          })
+                          setContactSuccess(true)
+                        } catch (err) {
+                          setError('Failed to send message. Please try again.')
+                        } finally {
+                          setContactLoading(false)
+                        }
+                      }}
+                      variant="contained"
+                      startIcon={<Send />}
+                      disabled={contactLoading}
+                    >
+                      {contactLoading ? 'Sending...' : 'Send Message'}
+                    </Button>
+                  )}
+                </DialogActions>
+              </Dialog>
             </CardContent>
           </Card>
         </motion.div>

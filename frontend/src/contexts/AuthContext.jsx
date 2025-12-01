@@ -43,23 +43,44 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('Attempting login with:', { email, passwordLength: password?.length })
+      
       const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
-        password,
+        email: email.trim(),
+        password: password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
-      const { token: newToken, user: userData } = response.data
+      console.log('Login response:', response.status, response.data)
 
-      setToken(newToken)
-      setUser(userData)
-      localStorage.setItem('token', newToken)
-      localStorage.setItem('user', JSON.stringify(userData))
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+      if (response.data && response.data.token) {
+        const { token: newToken, user: userData } = response.data
 
-      return true
+        setToken(newToken)
+        setUser(userData)
+        localStorage.setItem('token', newToken)
+        localStorage.setItem('user', JSON.stringify(userData))
+        axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+
+        return true
+      } else {
+        console.error('No token in response:', response.data)
+        return false
+      }
     } catch (error) {
       console.error('Login error:', error)
-      return false
+      if (error.response) {
+        console.error('Error response:', error.response.status, error.response.data)
+        throw new Error(error.response.data?.error || 'Login failed')
+      } else if (error.request) {
+        console.error('No response received:', error.request)
+        throw new Error('Cannot connect to server. Please check if backend is running.')
+      } else {
+        throw new Error(error.message || 'Login failed')
+      }
     }
   }
 

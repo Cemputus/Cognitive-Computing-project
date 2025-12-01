@@ -53,8 +53,49 @@ export const apiService = {
     const response = await api.get('/dashboard/stats')
     return response.data
   },
+
+  // Advanced Analytics
+  getLocationSentiment: async (sentimentFilter = 'all') => {
+    const response = await api.get(`/analytics/location-sentiment?sentiment=${sentimentFilter}`)
+    return response.data
+  },
+
+  getPlatformSentiment: async (sentimentFilter = 'all') => {
+    const response = await api.get(`/analytics/platform-sentiment?sentiment=${sentimentFilter}`)
+    return response.data
+  },
+
+  getTopicSentiment: async (sentimentFilter = 'all') => {
+    const response = await api.get(`/analytics/topic-sentiment?sentiment=${sentimentFilter}`)
+    return response.data
+  },
+
+  // Export report
+  exportReport: async (reportType = 'dashboard') => {
+    const response = await api.post('/export/report', { type: reportType })
+    return response.data
+  },
+
+  // Contact admin
+  contactAdmin: async (data) => {
+    const response = await api.post('/contact-admin', data)
+    return response.data
+  },
+
+  // Get notifications
+  getNotifications: async () => {
+    const response = await api.get('/notifications')
+    return response.data
+  },
+
+  // Mark notification as read
+  markNotificationRead: async (notificationId) => {
+    const response = await api.post('/notifications/mark-read', { id: notificationId })
+    return response.data
+  },
 }
 
 export default api
+
 
 

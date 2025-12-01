@@ -11,8 +11,9 @@ from datetime import datetime
 import sys
 import os
 
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+# Add backend directory to path for imports (src is now in backend/)
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, backend_dir)
 
 from src.models.sentiment_analyzer import SentimentAnalyzer
 from src.utils.text_preprocessor import TextPreprocessor

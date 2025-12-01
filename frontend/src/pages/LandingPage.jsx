@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
 import { FaShieldAlt, FaRocket } from 'react-icons/fa'
+import Navbar from '../components/Navbar'
 
 const LandingPage = () => {
   const navigate = useNavigate()
@@ -75,9 +76,11 @@ const LandingPage = () => {
   ]
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* Hero Section */}
-      <Box
+    <>
+      <Navbar />
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 8 }}>
+        {/* Hero Section */}
+        <Box
         sx={{
           background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
           color: 'white',
@@ -113,10 +116,10 @@ const LandingPage = () => {
                 textAlign: 'center',
               }}
             >
-              Business Intelligence
+              CENAnalytics
               <br />
               <Box component="span" sx={{ color: alpha('#fff', 0.9) }}>
-                Made Simple
+                Business Intelligence Made Simple
               </Box>
             </Typography>
             <Typography
@@ -359,10 +362,12 @@ const LandingPage = () => {
           </motion.div>
         </Container>
       </Box>
-    </Box>
+      </Box>
+    </>
   )
 }
 
 export default LandingPage
+
 
 

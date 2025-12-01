@@ -95,9 +95,10 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def find_user_by_email(email: str) -> Optional[Dict]:
-    """Find a user by email"""
+    """Find a user by email (case-insensitive)"""
+    email_lower = email.lower().strip()
     for user in SAMPLE_USERS:
-        if user['email'] == email:
+        if user['email'].lower() == email_lower:
             return user
     return None
 
@@ -112,6 +113,7 @@ def authenticate_user(email: str, password: str) -> Optional[Dict]:
         # Return user data without password
         user_data = {k: v for k, v in user.items() if k != 'password'}
         return user_data
+    
     return None
 
 
@@ -148,10 +150,14 @@ def get_all_users() -> List[Dict]:
 def save_users_to_file():
     """Save user list to JSON file (without passwords)"""
     users_data = get_all_users()
-    os.makedirs('data', exist_ok=True)
-    with open('data/users.json', 'w') as f:
+    # Get backend directory (where this file is located)
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(backend_dir, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    users_file = os.path.join(data_dir, 'users.json')
+    with open(users_file, 'w') as f:
         json.dump(users_data, f, indent=2)
-    print(f"✅ Saved {len(users_data)} users to data/users.json")
+    print(f"✅ Saved {len(users_data)} users to {users_file}")
 
 
 if __name__ == '__main__':
