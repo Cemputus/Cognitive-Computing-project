@@ -1,7 +1,7 @@
 # User Manual: Small Business Intelligence Analyst
 
-**Version**: 1.0  
-**Date**: December 2024  
+**Version**: 1.0
+**Date**: December 2025
 **For**: Small Business Owners in Kampala, Uganda
 
 ---
@@ -13,8 +13,8 @@
 3. [Using the Dashboard](#using-the-dashboard)
 4. [Sentiment Analysis](#sentiment-analysis)
 5. [Topic Analysis](#topic-analysis)
-6. [Trends & Insights](#trends--insights)
-7. [Tips & Best Practices](#tips--best-practices)
+6. [Trends &amp; Insights](#trends--insights)
+7. [Tips &amp; Best Practices](#tips--best-practices)
 8. [Troubleshooting](#troubleshooting)
 9. [FAQ](#faq)
 
@@ -34,6 +34,7 @@ The Business Intelligence Analyst is a cognitive computing system that helps sma
 ### Who is it for?
 
 This system is designed for:
+
 - Small business owners in Kampala
 - Business managers who want data-driven insights
 - Anyone who wants to understand customer feedback better
@@ -80,14 +81,17 @@ The dashboard is your main page. It shows:
 **Total Reviews**: Shows how many customer reviews have been analyzed
 
 **Positive Sentiment**: Percentage of reviews with positive sentiment
+
 - Green color = Good
 - Higher percentage = More satisfied customers
 
 **Negative Sentiment**: Percentage of reviews with negative sentiment
+
 - Red color = Needs attention
 - Lower percentage = Better
 
 **Key Topics**: Number of main themes found in reviews
+
 - Helps identify what customers talk about most
 
 ### Quick Actions
@@ -105,6 +109,7 @@ The dashboard has three quick action cards:
 ### What is Sentiment Analysis?
 
 Sentiment analysis determines if customer feedback is:
+
 - ✅ **Positive**: Happy, satisfied customers
 - ⚠️ **Negative**: Unhappy, dissatisfied customers
 - ➡️ **Neutral**: Neither positive nor negative
@@ -118,15 +123,18 @@ Sentiment analysis determines if customer feedback is:
 
 ### Understanding Results
 
-**Sentiment Label**: 
+**Sentiment Label**:
+
 - Shows if the review is Positive, Negative, or Neutral
 
 **Scores**:
+
 - **Positive**: 0-100% (higher = more positive)
 - **Neutral**: 0-100% (higher = more neutral)
 - **Negative**: 0-100% (higher = more negative)
 
-**Compound Score**: 
+**Compound Score**:
+
 - Overall sentiment score (-1 to +1)
 - Positive = above 0
 - Negative = below 0
@@ -136,6 +144,7 @@ Sentiment analysis determines if customer feedback is:
 **Review**: "Great service! The staff was very helpful."
 
 **Result**:
+
 - Sentiment: **Positive**
 - Positive: 85%
 - Neutral: 10%
@@ -151,6 +160,7 @@ Sentiment analysis determines if customer feedback is:
 ### What is Topic Analysis?
 
 Topic analysis identifies the main themes or subjects that customers discuss in their reviews. This helps you understand:
+
 - What customers care about most
 - Common issues or complaints
 - Positive aspects customers mention
@@ -164,11 +174,13 @@ Topic analysis identifies the main themes or subjects that customers discuss in 
 ### Understanding Topics
 
 Each topic shows:
+
 - **Topic Number**: Identifier (Topic 1, Topic 2, etc.)
 - **Review Count**: How many reviews mention this topic
 - **Key Words**: Important words in this topic
 
 **Example Topic**:
+
 - **Topic 1**: Service & Quality
 - **Found in**: 450 reviews
 - **Key Words**: service (25%), quality (18%), staff (15%), delivery (12%)
@@ -182,6 +194,7 @@ Each topic shows:
 ### What are Trends & Insights?
 
 Trends show how customer sentiment changes over time. This helps you:
+
 - See if sentiment is improving or declining
 - Predict future customer satisfaction
 - Make proactive business decisions
@@ -196,14 +209,17 @@ Trends show how customer sentiment changes over time. This helps you:
 ### Understanding the Chart
 
 **Historical Data** (Blue Line):
+
 - Shows past sentiment trends
 - Helps you see patterns
 
 **Forecast** (Red/Orange/Purple Lines):
+
 - Predicts future sentiment
 - Multiple methods for accuracy
 
 **Trend Direction**:
+
 - 📈 **INCREASING**: Sentiment getting better
 - 📉 **DECREASING**: Sentiment getting worse
 - ➡️ **STABLE**: Sentiment staying the same
@@ -213,16 +229,19 @@ Trends show how customer sentiment changes over time. This helps you:
 The system provides recommendations based on trends:
 
 **If Decreasing**:
+
 - ⚠️ Investigate recent complaints
 - ⚠️ Improve customer service
 - ⚠️ Address common issues
 
 **If Increasing**:
+
 - ✅ Maintain current quality
 - ✅ Identify successful strategies
 - ✅ Capitalize on positive momentum
 
 **If Stable**:
+
 - ➡️ Maintain service levels
 - ➡️ Look for improvement opportunities
 
@@ -240,11 +259,13 @@ The system provides recommendations based on trends:
 ### What to Look For
 
 **Positive Trends**:
+
 - Increasing positive sentiment
 - Good topic coverage
 - High customer satisfaction
 
 **Warning Signs**:
+
 - Decreasing sentiment
 - Negative topics increasing
 - Low satisfaction scores
@@ -252,12 +273,14 @@ The system provides recommendations based on trends:
 ### Action Items
 
 **When Sentiment is Negative**:
+
 1. Read negative reviews to understand issues
 2. Identify common complaints
 3. Take action to address problems
 4. Monitor if sentiment improves
 
 **When Sentiment is Positive**:
+
 1. Identify what customers like
 2. Maintain those strengths
 3. Use positive feedback in marketing
@@ -270,20 +293,24 @@ The system provides recommendations based on trends:
 ### Common Issues
 
 **Problem**: "Failed to load data"
+
 - **Solution**: Check internet connection
 - **Solution**: Refresh the page
 - **Solution**: Contact support if problem persists
 
 **Problem**: "Analysis taking too long"
+
 - **Solution**: Wait a few seconds (normal for large datasets)
 - **Solution**: Try with smaller text
 
 **Problem**: "Results don't make sense"
+
 - **Solution**: Check if text is in English (best results)
 - **Solution**: Ensure text is complete (not just a few words)
 - **Solution**: Try re-analyzing
 
 **Problem**: "Can't see visualizations"
+
 - **Solution**: Update your browser
 - **Solution**: Enable JavaScript
 - **Solution**: Try different browser
@@ -291,6 +318,7 @@ The system provides recommendations based on trends:
 ### Getting Help
 
 If you encounter issues:
+
 1. Check this troubleshooting section
 2. Review FAQ below
 3. Contact support (if available)
@@ -365,34 +393,36 @@ A: Address negative feedback, improve service quality, respond to customer conce
 ## Contact & Support
 
 **For Technical Issues:**
+
 - Check troubleshooting section
 - Review FAQ
 - Contact system administrator
 
 **For Business Questions:**
+
 - Consult business advisor
 - Review business intelligence best practices
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: December 2024  
+**Document Version**: 1.0
+**Last Updated**: December 2025
 **Status**: Complete ✅
 
 ---
 
 ## Quick Reference Card
 
-**Dashboard**: View overall statistics  
-**Sentiment**: Analyze individual reviews  
-**Topics**: Discover key themes  
+**Dashboard**: View overall statistics
+**Sentiment**: Analyze individual reviews
+**Topics**: Discover key themes
 **Trends**: See predictions and recommendations
 
-**Remember**: 
+**Remember**:
+
 - ✅ Use complete reviews for best results
 - ✅ Check trends regularly
 - ✅ Act on recommendations
 - ✅ Provide feedback to improve system
 
 **Happy Analyzing!** 📊
-

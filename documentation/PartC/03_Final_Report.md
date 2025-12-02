@@ -3,7 +3,7 @@
 **Course**: DSC3112 - Cognitive Computing  
 **Project**: Small Business Intelligence Analyst  
 **Scenario**: Scenario 4 - Small Business Intelligence Analyst (Sentiment Analysis and Market Trends)  
-**Date**: December 2024  
+**Date**: December 2025  
 **Status**: ✅ Complete
 
 ---
@@ -448,7 +448,7 @@ The project successfully meets all requirements and demonstrates strong understa
 
 ---
 
-**Report Prepared By**: [Your Name]  
+**Report Prepared By**: [Emmanuel Nsubuga]  
 **Date**: December 2024  
 **Version**: 1.0  
 **Status**: Complete ✅

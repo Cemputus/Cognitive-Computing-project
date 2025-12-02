@@ -1,7 +1,5 @@
 # Task C2: Ethical & Impact Analysis
 
-**Marks**: 5/20  
-**Status**: ✅ Complete
 
 ---
 
@@ -329,5 +327,5 @@ The system is ethically sound for deployment with appropriate documentation of l
 
 **Document Version**: 1.0  
 **Last Updated**: December 2024  
-**Author**: Cognitive Computing Project Team
+**Author**: Emmanuel Nsubuga
 

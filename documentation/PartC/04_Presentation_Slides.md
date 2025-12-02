@@ -1,7 +1,7 @@
 # Presentation Slides: Small Business Intelligence Analyst
 
-**Course**: DSC3112 - Cognitive Computing  
-**Duration**: 15-20 minutes  
+**Course**: DSC3112 - Cognitive Computing
+**Duration**: 15-20 minutes
 **Format**: PowerPoint/Google Slides
 
 ---
@@ -11,9 +11,9 @@
 **Small Business Intelligence Analyst**
 A Cognitive Computing System for Business Intelligence
 
-**Course**: DSC3112 - Cognitive Computing  
-**Scenario**: Scenario 4 - Sentiment Analysis and Market Trends  
-**Date**: December 2024
+**Course**: DSC3112 - Cognitive Computing
+**Scenario**: Scenario 4 - Sentiment Analysis and Market Trends
+**Date**: December 2025
 
 ---
 
@@ -22,6 +22,7 @@ A Cognitive Computing System for Business Intelligence
 **The Challenge**
 
 Small businesses in Kampala, Uganda struggle with:
+
 - 📊 Understanding customer sentiment from reviews
 - 🔍 Identifying key topics in feedback
 - 📈 Tracking market trends
@@ -36,6 +37,7 @@ Small businesses in Kampala, Uganda struggle with:
 **Our Approach**
 
 A cognitive computing system that:
+
 - ✅ **Understands** customer feedback through NLP
 - ✅ **Reasons** about insights using knowledge graphs
 - ✅ **Learns** from user feedback
@@ -74,21 +76,22 @@ A cognitive computing system that:
 **System Capabilities**
 
 1. **Sentiment Analysis**
+
    - VADER and TextBlob
    - 85.2% accuracy
    - Handles negations and context
-
 2. **Topic Modeling**
+
    - LDA-based topic discovery
    - 5 key topics identified
    - Business-relevant themes
-
 3. **Predictive Modeling**
+
    - Time series forecasting
    - 3 methods (MA, Linear, ARIMA)
    - Trend predictions
-
 4. **Knowledge Graphs**
+
    - Entity relationships
    - 71 nodes, 1,295 edges
    - Dynamic graph construction
@@ -99,14 +102,14 @@ A cognitive computing system that:
 
 **Quantitative Metrics**
 
-| Metric | Result |
-|--------|--------|
-| **Sentiment Accuracy** | 85.2% |
-| **Precision** | 0.86 |
-| **Recall** | 0.85 |
-| **F1-Score** | 0.85 |
-| **Topic Coherence** | 0.52 |
-| **Forecast Accuracy** | 78% |
+| Metric                       | Result |
+| ---------------------------- | ------ |
+| **Sentiment Accuracy** | 85.2%  |
+| **Precision**          | 0.86   |
+| **Recall**             | 0.85   |
+| **F1-Score**           | 0.85   |
+| **Topic Coherence**    | 0.52   |
+| **Forecast Accuracy**  | 78%    |
 
 **Baseline Comparison**: +23.4% improvement over keyword-based method
 
@@ -116,13 +119,13 @@ A cognitive computing system that:
 
 **Cognitive vs. Simple Keyword Method**
 
-| Feature | Baseline | Cognitive | Improvement |
-|---------|----------|-----------|-------------|
-| Accuracy | 61.8% | 85.2% | **+23.4%** |
-| Context Understanding | ❌ | ✅ | N/A |
-| Topic Discovery | ❌ | ✅ | N/A |
-| Trend Forecasting | ❌ | ✅ | N/A |
-| Learning Ability | ❌ | ✅ | N/A |
+| Feature               | Baseline | Cognitive | Improvement      |
+| --------------------- | -------- | --------- | ---------------- |
+| Accuracy              | 61.8%    | 85.2%     | **+23.4%** |
+| Context Understanding | ❌       | ✅        | N/A              |
+| Topic Discovery       | ❌       | ✅        | N/A              |
+| Trend Forecasting     | ❌       | ✅        | N/A              |
+| Learning Ability      | ❌       | ✅        | N/A              |
 
 **Key Advantage**: Cognitive approach understands context, not just keywords
 
@@ -133,6 +136,7 @@ A cognitive computing system that:
 **Modern React Application**
 
 **Features:**
+
 - 📊 Dashboard with statistics
 - 💬 Sentiment analysis page
 - 📝 Topic analysis
@@ -140,6 +144,7 @@ A cognitive computing system that:
 - 🎨 Material-UI styling
 
 **Benefits:**
+
 - Intuitive and user-friendly
 - Responsive design
 - Clear visualizations
@@ -205,11 +210,13 @@ A cognitive computing system that:
 **Data Bias & Fairness**
 
 **Identified:**
+
 - ⚠️ Linguistic bias (English-focused)
 - ⚠️ Regional underrepresentation
 - ⚠️ Business type concentration
 
 **Mitigation:**
+
 - ✅ Transparent documentation
 - ✅ Bias monitoring
 - ✅ Feedback mechanism
@@ -224,16 +231,19 @@ A cognitive computing system that:
 **Societal Impact**
 
 **Economic:**
+
 - Helps small businesses grow
 - Improves decision-making
 - Creates competitive advantage
 
 **Social:**
+
 - Enhances digital literacy
 - Empowers business owners
 - Accessible to non-technical users
 
 **Technological:**
+
 - Demonstrates cognitive computing
 - Encourages technology adoption
 - Builds local capabilities
@@ -245,15 +255,16 @@ A cognitive computing system that:
 **Key Challenges**
 
 1. **Data Collection**
+
    - Solution: Synthetic + web scraping
-
 2. **Language Support**
+
    - Solution: Focus on English, document limitations
-
 3. **Model Performance**
-   - Solution: Ensemble methods, tuning
 
+   - Solution: Ensemble methods, tuning
 4. **Time Constraints**
+
    - Solution: Prioritized core features
 
 ---
@@ -263,16 +274,19 @@ A cognitive computing system that:
 **Roadmap**
 
 **Short-Term (1-3 months):**
+
 - Enhanced Luganda support
 - Automated retraining
 - Performance optimization
 
 **Medium-Term (3-6 months):**
+
 - Real-time streaming
 - Multi-business dashboard
 - Advanced ML models
 
 **Long-Term (6+ months):**
+
 - Multimodal analysis
 - Conversational AI
 - Enterprise features
@@ -284,18 +298,22 @@ A cognitive computing system that:
 **Project Success**
 
 ✅ **All 4 Cognitive Pillars Implemented**
+
 - Understand, Reason, Learn, Interact
 
 ✅ **High Performance**
+
 - 85.2% accuracy
 - 23.4% improvement over baseline
 
 ✅ **Real-World Value**
+
 - Addresses actual business need
 - Actionable insights
 - User-friendly interface
 
 ✅ **Ethical & Responsible**
+
 - Bias awareness
 - Privacy protection
 - Transparent limitations
@@ -351,6 +369,7 @@ A cognitive computing system that:
 Thank you for your attention!
 
 **Contact:**
+
 - Project Repository: [GitHub Link]
 - Documentation: `docs/` folder
 - Demo: Available for testing
@@ -366,8 +385,8 @@ Thank you for your attention!
 5. **Practice**: Rehearse timing and transitions
 
 **Key Points to Emphasize:**
+
 - All 4 cognitive pillars implemented
 - Significant improvement over baseline
 - Real-world applicability
 - Ethical considerations addressed
-

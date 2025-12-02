@@ -1,6 +1,6 @@
 # Task C1: System Evaluation Report
 
-**Marks**: 10/20  
+
 **Status**: ✅ Complete
 
 ---
@@ -409,7 +409,7 @@ The Small Business Intelligence Analyst demonstrates strong performance across a
 
 ---
 
-**Report Prepared By**: [Your Name]  
+**Report Prepared By**: [Emmanuel Nsubuga]  
 **Date**: December 2025  
 **Version**: 1.0
 

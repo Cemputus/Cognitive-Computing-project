@@ -202,8 +202,8 @@ The notebook **DOES meet all Task B1 requirements**:
 
 - [X] Enhanced Luganda support
 - [X] Data lineage tracking
-- [ ] Automated data quality scoring
-- [ ] Data profiling report
+- [X] Automated data quality scoring
+- [X] Data profiling report
 
 ---
 
