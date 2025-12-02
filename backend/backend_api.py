@@ -795,57 +795,172 @@ def export_report():
         except Exception as e:
             print(f"Error gathering report data: {e}")
         
-        # Create CSV report
-        csv_data = []
-        csv_data.append("Business Intelligence Analytics Report")
-        csv_data.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        csv_data.append("")
+        # Generate PDF Report
+        pdf_buffer = io.BytesIO()
+        doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
+        story = []
+        styles = getSampleStyleSheet()
         
+        # Title
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#5624d0'),
+            spaceAfter=30,
+            alignment=1  # Center
+        )
+        story.append(Paragraph("CENAnalytics Business Intelligence Report", title_style))
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Report Info
+        info_style = ParagraphStyle(
+            'InfoStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.grey
+        )
+        story.append(Paragraph(f"<b>Report Type:</b> {report_type.title()}", styles['Normal']))
+        story.append(Paragraph(f"<b>Generated:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Dashboard Statistics
         if 'dashboard_stats' in report_data:
-            csv_data.append("=== Dashboard Statistics ===")
+            story.append(Paragraph("<b>Dashboard Statistics</b>", styles['Heading2']))
             stats = report_data['dashboard_stats']
-            csv_data.append(f"Total Reviews: {stats.get('total_reviews', 0)}")
-            csv_data.append(f"Positive: {stats.get('positive_pct', 0)}%")
-            csv_data.append(f"Negative: {stats.get('negative_pct', 0)}%")
-            csv_data.append(f"Neutral: {stats.get('neutral_pct', 0)}%")
-            csv_data.append("")
+            stats_data = [
+                ['Metric', 'Value'],
+                ['Total Reviews', f"{stats.get('total_reviews', 0):,}"],
+                ['Positive Sentiment', f"{stats.get('positive_pct', 0):.1f}%"],
+                ['Negative Sentiment', f"{stats.get('negative_pct', 0):.1f}%"],
+                ['Neutral Sentiment', f"{stats.get('neutral_pct', 0):.1f}%"],
+            ]
+            stats_table = Table(stats_data, colWidths=[3*inch, 2*inch])
+            stats_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#5624d0')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            story.append(stats_table)
+            story.append(Spacer(1, 0.3*inch))
         
-        if 'location_analytics' in report_data:
-            csv_data.append("=== Location Analytics ===")
-            csv_data.append("Location,Total,Positive %,Negative %,Neutral %")
+        # Location Analytics
+        if 'location_analytics' in report_data and report_data['location_analytics'].get('locations'):
+            story.append(Paragraph("<b>Location-Based Sentiment Analysis</b>", styles['Heading2']))
+            loc_data = [['Location', 'Total', 'Positive %', 'Negative %', 'Neutral %']]
             for loc in report_data['location_analytics'].get('locations', [])[:10]:
-                csv_data.append(f"{loc.get('location', '')},{loc.get('total', 0)},{loc.get('positive_pct', 0)},{loc.get('negative_pct', 0)},{loc.get('neutral_pct', 0)}")
-            csv_data.append("")
+                loc_data.append([
+                    loc.get('location', 'N/A'),
+                    str(loc.get('total', 0)),
+                    f"{loc.get('positive_pct', 0):.1f}%",
+                    f"{loc.get('negative_pct', 0):.1f}%",
+                    f"{loc.get('neutral_pct', 0):.1f}%"
+                ])
+            loc_table = Table(loc_data, colWidths=[1.5*inch, 1*inch, 1*inch, 1*inch, 1*inch])
+            loc_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#5624d0')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            story.append(loc_table)
+            story.append(Spacer(1, 0.3*inch))
         
-        if 'platform_analytics' in report_data:
-            csv_data.append("=== Platform Analytics ===")
-            csv_data.append("Platform,Total,Positive %,Negative %,Neutral %")
+        # Platform Analytics
+        if 'platform_analytics' in report_data and report_data['platform_analytics'].get('platforms'):
+            story.append(Paragraph("<b>Platform-Based Sentiment Analysis</b>", styles['Heading2']))
+            plat_data = [['Platform', 'Total', 'Positive %', 'Negative %', 'Neutral %']]
             for plat in report_data['platform_analytics'].get('platforms', []):
-                csv_data.append(f"{plat.get('platform', '')},{plat.get('total', 0)},{plat.get('positive_pct', 0)},{plat.get('negative_pct', 0)},{plat.get('neutral_pct', 0)}")
-            csv_data.append("")
+                plat_data.append([
+                    plat.get('platform', 'N/A'),
+                    str(plat.get('total', 0)),
+                    f"{plat.get('positive_pct', 0):.1f}%",
+                    f"{plat.get('negative_pct', 0):.1f}%",
+                    f"{plat.get('neutral_pct', 0):.1f}%"
+                ])
+            plat_table = Table(plat_data, colWidths=[1.5*inch, 1*inch, 1*inch, 1*inch, 1*inch])
+            plat_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#5624d0')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            story.append(plat_table)
+            story.append(Spacer(1, 0.3*inch))
         
-        csv_content = "\n".join(csv_data)
-        csv_bytes = csv_content.encode('utf-8')
+        # Topic Analytics
+        if 'topic_analytics' in report_data and report_data['topic_analytics'].get('topics'):
+            story.append(Paragraph("<b>Topic-Based Sentiment Analysis</b>", styles['Heading2']))
+            topic_data = [['Topic', 'Total', 'Positive %', 'Negative %', 'Neutral %']]
+            for topic in report_data['topic_analytics'].get('topics', []):
+                topic_data.append([
+                    topic.get('topic_name', 'N/A')[:30],  # Truncate long names
+                    str(topic.get('total', 0)),
+                    f"{topic.get('positive_pct', 0):.1f}%",
+                    f"{topic.get('negative_pct', 0):.1f}%",
+                    f"{topic.get('neutral_pct', 0):.1f}%"
+                ])
+            topic_table = Table(topic_data, colWidths=[2*inch, 1*inch, 1*inch, 1*inch, 1*inch])
+            topic_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#5624d0')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            story.append(topic_table)
+            story.append(Spacer(1, 0.3*inch))
         
-        # Send email to admin with report
+        # Footer
+        story.append(Spacer(1, 0.5*inch))
+        story.append(Paragraph("<i>Generated by CENAnalytics Business Intelligence Platform</i>", info_style))
+        
+        # Build PDF
+        doc.build(story)
+        pdf_bytes = pdf_buffer.getvalue()
+        pdf_buffer.close()
+        
+        # Send email to admin with PDF attachment
         admin_email = "ensubuga019@gmail.com"
         email_body = f"""
         <html>
-        <body>
-            <h2>CENAnalytics Report Export</h2>
+        <body style="font-family: Arial, sans-serif;">
+            <h2 style="color: #5624d0;">CENAnalytics Report Export</h2>
             <p>A user has exported an analytics report from CENAnalytics Platform.</p>
             <p><strong>Report Type:</strong> {report_type}</p>
             <p><strong>Generated:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             <hr>
-            <h3>Report Summary</h3>
-            <pre>{csv_content[:2000]}</pre>
-            <p><small>Full report attached as CSV file.</small></p>
+            <p>The complete analytics report is attached as a PDF file.</p>
+            <p><small>This is an automated message from CENAnalytics Platform.</small></p>
         </body>
         </html>
         """
         
-        filename = f"analytics_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-        email_sent = send_email(admin_email, "CENAnalytics Report Export", email_body, csv_bytes, filename)
+        pdf_filename = f"CENAnalytics_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        email_sent = send_email(admin_email, "CENAnalytics Report Export", email_body, pdf_bytes, pdf_filename)
         
         # Get user info from token
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -883,12 +998,15 @@ def export_report():
                 'user_email': user_info.get('email', 'unknown')
             })
         
-        # Return report data to frontend
+        # Return PDF to frontend for download
+        pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
+        
         return jsonify({
             'status': 'success',
             'message': 'Report exported and sent to admin',
             'report': report_data,
-            'csv': csv_content,
+            'pdf': pdf_base64,
+            'filename': pdf_filename,
             'notifications_created': notification_id + (1 if email_sent else 0)
         })
     except Exception as e:

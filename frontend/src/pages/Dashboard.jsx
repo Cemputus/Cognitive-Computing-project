@@ -76,7 +76,7 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    fetchAllData()
+    fetchAllData(true)
   }, [])
 
   useEffect(() => {
@@ -91,9 +91,11 @@ const Dashboard = () => {
     fetchTopicData()
   }, [topicFilter])
 
-  const fetchAllData = async () => {
+  const fetchAllData = async (showLoading = false) => {
     try {
-      setLoading(true)
+      if (showLoading) {
+        setLoading(true)
+      }
       const [statsData, locData, platData, topData] = await Promise.all([
         apiService.getDashboardStats(),
         apiService.getLocationSentiment('all'),
@@ -108,7 +110,9 @@ const Dashboard = () => {
     } catch (err) {
       setError(err.message || 'Failed to load dashboard data')
     } finally {
-      setLoading(false)
+      if (showLoading) {
+        setLoading(false)
+      }
     }
   }
 
@@ -141,16 +145,58 @@ const Dashboard = () => {
     }
   }
 
-  const handleRefresh = () => {
-    fetchAllData()
-    fetchLocationData()
-    fetchPlatformData()
-    fetchTopicData()
+  const handleRefresh = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      await Promise.all([
+        fetchAllData(false),
+        fetchLocationData(),
+        fetchPlatformData(),
+        fetchTopicData()
+      ])
+      setSnackbar({
+        open: true,
+        message: 'Data refreshed successfully!',
+        severity: 'success'
+      })
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: 'Failed to refresh data: ' + (err.message || 'Unknown error'),
+        severity: 'error'
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleExportReport = async () => {
     try {
+      setLoading(true)
       const response = await apiService.exportReport('dashboard')
+      
+      // Download PDF
+      if (response.pdf && response.filename) {
+        // Convert base64 to blob
+        const byteCharacters = atob(response.pdf)
+        const byteNumbers = new Array(byteCharacters.length)
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i)
+        }
+        const byteArray = new Uint8Array(byteNumbers)
+        const blob = new Blob([byteArray], { type: 'application/pdf' })
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = response.filename || 'CENAnalytics_Report.pdf'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }
       
       // Refresh notifications to get new ones
       await fetchNotifications()
@@ -158,7 +204,7 @@ const Dashboard = () => {
       // Show success message
       setSnackbar({
         open: true,
-        message: 'Report exported successfully! A copy has been sent to ensubuga019@gmail.com',
+        message: 'Report exported successfully! PDF downloaded and a copy has been sent to ensubuga019@gmail.com',
         severity: 'success'
       })
     } catch (err) {
@@ -167,6 +213,8 @@ const Dashboard = () => {
         message: 'Failed to export report: ' + (err.message || 'Unknown error'),
         severity: 'error'
       })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -775,6 +823,22 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }

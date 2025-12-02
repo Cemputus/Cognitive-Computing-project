@@ -53,3 +53,6 @@ scipy>=1.10.0
 # Utilities
 python-dotenv>=1.0.0
 tqdm>=4.65.0
+
+# PDF Generation
+reportlab>=4.0.0

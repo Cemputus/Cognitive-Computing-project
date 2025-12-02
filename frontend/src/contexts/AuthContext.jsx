@@ -15,6 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Check for stored token on mount
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user')
       }
     }
+    setLoading(false)
   }, [])
 
   const login = async (email, password) => {
@@ -99,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated: !!user && !!token,
     isAdmin: user?.role === 'admin',
+    loading,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
