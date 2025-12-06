@@ -182,3 +182,15 @@ if __name__ == '__main__':
     for i, user in enumerate(SAMPLE_USERS[1:], 1):
         print(f"  User {i}: {user['email']} / user123")
 
+
+    # Save users when run directly
+    save_users_to_file()
+    print("\nSample Users Created:")
+    print("=" * 60)
+    print("Admin Account:")
+    print("  Email: admin@business.com")
+    print("  Password: admin123")
+    print("\nUser Accounts (7 users):")
+    for i, user in enumerate(SAMPLE_USERS[1:], 1):
+        print(f"  User {i}: {user['email']} / user123")
+

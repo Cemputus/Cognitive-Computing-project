@@ -131,10 +131,6 @@ const theme = createTheme({
     '0 25px 50px rgba(0,0,0,0.15)',
     '0 25px 50px rgba(0,0,0,0.15)',
     '0 25px 50px rgba(0,0,0,0.15)',
-    '0 25px 50px rgba(0,0,0,0.15)',
-    '0 25px 50px rgba(0,0,0,0.15)',
-    '0 25px 50px rgba(0,0,0,0.15)',
-    '0 25px 50px rgba(0,0,0,0.15)',
   ],
   components: {
     MuiButton: {

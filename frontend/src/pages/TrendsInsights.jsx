@@ -187,9 +187,11 @@ const TrendsInsights = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Export Forecast Data">
-            <IconButton onClick={handleExport} color="primary" disabled={!forecast}>
-              <Download />
-            </IconButton>
+            <span>
+              <IconButton onClick={handleExport} color="primary" disabled={!forecast}>
+                <Download />
+              </IconButton>
+            </span>
           </Tooltip>
         </Box>
       </Box>

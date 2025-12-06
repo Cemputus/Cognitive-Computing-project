@@ -3,6 +3,15 @@ Flask/FastAPI Backend for React Frontend
 Provides REST API endpoints for the Business Intelligence Analyst
 """
 
+import sys
+import io
+# Set UTF-8 encoding for stdout/stderr to handle emoji characters
+# Only wrap if buffer attribute exists (not available in Jupyter notebooks)
+if sys.stdout.encoding != 'utf-8' and hasattr(sys.stdout, 'buffer'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8' and hasattr(sys.stderr, 'buffer'):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import wraps
@@ -63,13 +72,21 @@ try:
     # First try: Milestone 2 output (with sentiment already analyzed)
     reviews_path = os.path.join(backend_dir, 'data', 'processed', 'reviews_with_sentiment.csv')
     if os.path.exists(reviews_path):
-        df_reviews = pd.read_csv(reviews_path)
+        try:
+            df_reviews = pd.read_csv(reviews_path)
+        except:
+            # Fallback to python engine if default fails
+            df_reviews = pd.read_csv(reviews_path, engine='python', encoding='utf-8')
         print(f"✅ Loaded {len(df_reviews)} reviews from Milestone 2 output (reviews_with_sentiment.csv)")
     else:
         # Fallback: Milestone 1 output (needs sentiment analysis)
         cleaned_path = os.path.join(backend_dir, 'data', 'processed', 'cleaned_reviews.csv')
         if os.path.exists(cleaned_path):
-            df_reviews = pd.read_csv(cleaned_path)
+            try:
+                df_reviews = pd.read_csv(cleaned_path)
+            except:
+                # Fallback to python engine if default fails
+                df_reviews = pd.read_csv(cleaned_path, engine='python', encoding='utf-8')
             print(f"✅ Loaded {len(df_reviews)} reviews from Milestone 1 output (cleaned_reviews.csv)")
             # If sentiment column doesn't exist, we'll analyze it on-the-fly
             if 'sentiment' not in df_reviews.columns:
@@ -113,6 +130,107 @@ def token_required(f):
 def health():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'message': 'API is running'})
+
+@app.route('/api/data-status', methods=['GET'])
+@token_required
+def data_status():
+    """Check data file availability and status"""
+    try:
+        status = {
+            'reviews_with_sentiment': {
+                'path': os.path.join(backend_dir, 'data', 'processed', 'reviews_with_sentiment.csv'),
+                'exists': False,
+                'row_count': 0,
+                'has_sentiment': False
+            },
+            'cleaned_reviews': {
+                'path': os.path.join(backend_dir, 'data', 'processed', 'cleaned_reviews.csv'),
+                'exists': False,
+                'row_count': 0
+            },
+            'lda_model': {
+                'path': os.path.join(backend_dir, 'data', 'models', 'lda_model'),
+                'exists': False
+            },
+            'forecast_results': {
+                'path': os.path.join(backend_dir, 'data', 'models', 'forecast_results.json'),
+                'exists': False,
+                'can_generate_on_the_fly': True
+            }
+        }
+        
+        # Check reviews_with_sentiment.csv
+        reviews_path = status['reviews_with_sentiment']['path']
+        if os.path.exists(reviews_path):
+            status['reviews_with_sentiment']['exists'] = True
+            try:
+                df = pd.read_csv(reviews_path, nrows=1000)  # Sample to check columns
+                status['reviews_with_sentiment']['row_count'] = len(pd.read_csv(reviews_path))
+                status['reviews_with_sentiment']['has_sentiment'] = 'sentiment' in df.columns
+            except Exception as e:
+                status['reviews_with_sentiment']['error'] = str(e)
+        
+        # Check cleaned_reviews.csv (fallback)
+        cleaned_path = status['cleaned_reviews']['path']
+        if os.path.exists(cleaned_path):
+            status['cleaned_reviews']['exists'] = True
+            try:
+                status['cleaned_reviews']['row_count'] = len(pd.read_csv(cleaned_path))
+            except Exception as e:
+                status['cleaned_reviews']['error'] = str(e)
+        
+        # Check LDA model
+        lda_path = status['lda_model']['path']
+        if os.path.exists(lda_path):
+            status['lda_model']['exists'] = True
+        
+        # Check forecast_results.json
+        forecast_path = status['forecast_results']['path']
+        if os.path.exists(forecast_path):
+            status['forecast_results']['exists'] = True
+            try:
+                with open(forecast_path, 'r') as f:
+                    forecast_data = json.load(f)
+                    if 'forecast_dates' in forecast_data:
+                        status['forecast_results']['forecast_days'] = len(forecast_data.get('forecast_dates', []))
+            except Exception as e:
+                status['forecast_results']['error'] = str(e)
+        
+        # Determine overall status
+        has_review_data = status['reviews_with_sentiment']['exists'] or status['cleaned_reviews']['exists']
+        has_lda = status['lda_model']['exists']
+        has_forecast = status['forecast_results']['exists']
+        
+        overall_status = {
+            'ready': has_review_data,
+            'features_available': {
+                'sentiment_analysis': has_review_data,
+                'topic_analysis': has_lda,
+                'forecasts': has_forecast or has_review_data,  # Can generate on-the-fly
+                'dashboard': has_review_data
+            },
+            'recommendations': []
+        }
+        
+        if not has_review_data:
+            overall_status['recommendations'].append('Run Milestone 1 notebook to generate cleaned_reviews.csv')
+        if not status['reviews_with_sentiment']['exists'] and status['cleaned_reviews']['exists']:
+            overall_status['recommendations'].append('Run Milestone 2 notebook to generate reviews_with_sentiment.csv for better performance')
+        if not has_lda:
+            overall_status['recommendations'].append('Run Milestone 2 notebook to generate LDA model for Topic Analysis')
+        if not has_forecast and has_review_data:
+            overall_status['recommendations'].append('Forecasts will be generated on-the-fly (or run Milestone 2 to pre-generate)')
+        
+        return jsonify({
+            'status': 'success',
+            'data_status': status,
+            'overall': overall_status
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
 
 
 @app.route('/api/auth/login', methods=['POST', 'OPTIONS'])
@@ -553,12 +671,36 @@ def get_topics():
                 print("⚠️  LDA model not found at:", lda_path)
                 # Return user-friendly message but don't return 404 so frontend can still display
                 return jsonify({
-                    'error': 'Topic models are being generated. Please check back shortly.',
-                    'message': 'Topic models are being processed and will be available soon.',
+                    'error': 'LDA model file not found.',
+                    'message': 'The topic model file does not exist. Please run the Milestone 2 notebook to generate the model.',
                     'topics': []
                 }), 200
             
-            lda_model = LdaModel.load(lda_path)
+            print(f"📊 Loading LDA model from: {lda_path}")
+            try:
+                lda_model = LdaModel.load(lda_path)
+                print(f"✅ LDA model loaded successfully. Number of topics: {lda_model.num_topics}")
+            except Exception as load_error:
+                error_str = str(load_error)
+                error_type = type(load_error).__name__
+                print(f"❌ Error loading LDA model ({error_type}): {error_str}")
+                import traceback
+                traceback.print_exc()
+                
+                # Check for numpy version issues (most common problem)
+                if 'numpy' in error_str.lower() or '_core' in error_str.lower() or 'ModuleNotFoundError' in error_type:
+                    return jsonify({
+                        'error': 'LDA Model Version Mismatch',
+                        'message': 'The topic model was created with a different NumPy/Python version and cannot be loaded. To fix this, please:\n\n1. Open the Milestone 2 notebook: Cognitive Pillars/Milestone2/02_Understanding_Reasoning_Engine.ipynb\n2. Run the cells that create and save the LDA model\n3. Refresh this page after the model is regenerated.\n\nThe system will continue to work for other features (Dashboard, Sentiment Analysis, etc.).',
+                        'topics': []
+                    }), 200  # Return 200 so frontend can display the message gracefully
+                
+                # Other errors
+                return jsonify({
+                    'error': 'Error loading LDA model',
+                    'message': f'Unable to load the topic model. Error: {error_str}. Please ensure Milestone 2 notebook has been run successfully.',
+                    'topics': []
+                }), 200
             
             # Get number of topics from model
             num_topics = lda_model.num_topics
@@ -567,13 +709,24 @@ def get_topics():
             for topic_id in range(num_topics):
                 try:
                     topic_words = lda_model.show_topic(topic_id, topn=10)
+                    if not topic_words:
+                        print(f"⚠️  No words found for topic {topic_id}")
+                        continue
+                    
                     topic_words_list = [(word, weight) for word, weight in topic_words]
                     topic_name = generate_topic_name(topic_words_list)
                     
                     # Calculate review count for this topic
                     review_count = 0
-                    if 'topic' in df_reviews.columns:
-                        review_count = len(df_reviews[df_reviews.get('topic', -1) == topic_id])
+                    if not df_reviews.empty and 'topic' in df_reviews.columns:
+                        try:
+                            review_count = len(df_reviews[df_reviews['topic'] == topic_id])
+                        except:
+                            # Fallback: estimate based on equal distribution
+                            review_count = len(df_reviews) // num_topics if num_topics > 0 else 0
+                    elif not df_reviews.empty:
+                        # If no topic column, estimate based on equal distribution
+                        review_count = len(df_reviews) // num_topics if num_topics > 0 else 0
                     
                     topics.append({
                         'topic_id': topic_id,
@@ -581,34 +734,72 @@ def get_topics():
                         'topic_words': [{'word': word, 'weight': float(weight)} for word, weight in topic_words_list],
                         'review_count': review_count
                     })
+                    print(f"✅ Topic {topic_id}: {topic_name} ({review_count} reviews)")
                 except Exception as e:
-                    print(f"Error processing topic {topic_id}: {e}")
+                    print(f"❌ Error processing topic {topic_id}: {e}")
+                    import traceback
+                    traceback.print_exc()
                     continue
             
             if not topics:
+                print("⚠️  No topics could be extracted from the model")
                 return jsonify({
-                    'error': 'No topics could be loaded from the model.',
+                    'error': 'No topics could be loaded from the model. The model may be corrupted.',
+                    'message': 'Please ensure Milestone 2 notebook has been run successfully.',
                     'topics': []
-                }), 404
+                }), 200  # Return 200 so frontend can display the message gracefully
             
+            print(f"✅ Successfully loaded {len(topics)} topics")
+            # Return as array for consistency with frontend expectations
             return jsonify(topics)
-        except ImportError:
+        except (ModuleNotFoundError, ImportError) as e:
+            error_str = str(e)
+            print(f"❌ Import/Module error: {error_str}")
+            # Check for numpy version issues
+            if 'numpy' in error_str.lower() or '_core' in error_str.lower() or 'ModuleNotFoundError' in str(type(e)):
+                return jsonify({
+                    'error': 'LDA model version mismatch detected.',
+                    'message': 'The topic model was created with a different NumPy/Python version and cannot be loaded. Please regenerate the model by running the Milestone 2 notebook. The system will continue to work for other features.',
+                    'topics': []
+                }), 200  # Return 200 so frontend can display the message gracefully
             return jsonify({
                 'error': 'Gensim library not available. Please install gensim to use topic modeling.',
+                'message': 'Run: pip install gensim',
                 'topics': []
-            }), 500
+            }), 200  # Return 200 so frontend can display the message gracefully
         except Exception as e:
-            print(f"Error loading topics: {e}")
+            print(f"❌ Error loading topics: {e}")
             import traceback
             traceback.print_exc()
-            return jsonify({
-                'error': f'Error loading topic models: {str(e)}. Please ensure Milestone 2 notebook has been run.',
-                'topics': []
-            }), 500
+            error_msg = str(e)
+            # Check for numpy version issues in general exceptions too
+            if 'numpy' in error_msg.lower() or '_core' in error_msg.lower():
+                return jsonify({
+                    'error': 'LDA model version mismatch detected.',
+                    'message': 'The topic model was created with a different NumPy/Python version and cannot be loaded. Please regenerate the model by running the Milestone 2 notebook. The system will continue to work for other features.',
+                    'topics': []
+                }), 200  # Return 200 so frontend can display the message gracefully
+            if "No such file or directory" in error_msg or "cannot access" in error_msg.lower():
+                return jsonify({
+                    'error': 'LDA model files not found.',
+                    'message': 'Please ensure Milestone 2 notebook has been run to generate the topic model.',
+                    'topics': []
+                }), 200  # Return 200 so frontend can display the message gracefully
+            else:
+                return jsonify({
+                    'error': f'Error loading topic models: {error_msg}',
+                    'message': 'Please ensure Milestone 2 notebook has been run successfully.',
+                    'topics': []
+                }), 500
     except Exception as e:
+        print(f"❌ Unexpected error in get_topics: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e), 'topics': []}), 500
+        return jsonify({
+            'error': f'Unexpected error: {str(e)}',
+            'message': 'Please check the backend logs for more details.',
+            'topics': []
+        }), 500
 
 
 def generate_forecast_from_reviews(df_reviews, forecast_days=7):
@@ -1326,34 +1517,175 @@ def get_topic_sentiment():
     try:
         sentiment_filter = request.args.get('sentiment', 'all')
         
-        if df_reviews.empty or 'topic' not in df_reviews.columns or 'sentiment' not in df_reviews.columns:
-            return jsonify({'topics': [], 'summary': {}})
+        print(f"\n{'='*60}")
+        print(f"📊 TOPIC-SENTIMENT API CALLED (filter: {sentiment_filter})")
+        print(f"{'='*60}")
         
-        # Calculate total counts for percentage distribution
-        total_positive = (df_reviews['sentiment'] == 'positive').sum()
-        total_negative = (df_reviews['sentiment'] == 'negative').sum()
-        total_neutral = (df_reviews['sentiment'] == 'neutral').sum()
-        total_all = len(df_reviews)
+        if df_reviews.empty:
+            print("❌ df_reviews is empty!")
+            return jsonify({'topics': [], 'summary': {'message': 'No reviews loaded'}})
         
-        # Load topic names if available
+        if 'sentiment' not in df_reviews.columns:
+            print("❌ 'sentiment' column not found!")
+            return jsonify({'topics': [], 'summary': {'message': 'Sentiment column not found in data'}})
+        
+        print(f"✅ Reviews loaded: {len(df_reviews)}")
+        
+        # Load LDA model and topic names
+        lda_model = None
         topic_names = {}
+        num_topics = 10  # Default
+        
         try:
             from gensim.models import LdaModel
             lda_path = os.path.join(backend_dir, 'data', 'models', 'lda_model')
-            lda_model = LdaModel.load(lda_path)
-            for topic_id in range(5):
-                topic_words = lda_model.show_topic(topic_id, topn=10)
-                topic_names[topic_id] = generate_topic_name(topic_words)
-        except:
-            # Default names if LDA model not available
-            topic_names = {i: f"Topic {i}" for i in range(5)}
+            print(f"🔍 Checking LDA model at: {lda_path}")
+            
+            if os.path.exists(lda_path):
+                print("✅ LDA model file exists, loading...")
+                lda_model = LdaModel.load(lda_path)
+                num_topics = lda_model.num_topics
+                print(f"✅ LDA model loaded! Topics: {num_topics}")
+                
+                # Generate topic names
+                for topic_id in range(num_topics):
+                    try:
+                        topic_words = lda_model.show_topic(topic_id, topn=10)
+                        topic_names[topic_id] = generate_topic_name(topic_words)
+                        print(f"  Topic {topic_id}: {topic_names[topic_id]}")
+                    except Exception as e:
+                        topic_names[topic_id] = f"Topic {topic_id}"
+                        print(f"  ⚠️  Topic {topic_id}: Using default name")
+            else:
+                print(f"❌ LDA model not found at: {lda_path}")
+        except Exception as e:
+            print(f"❌ Error loading LDA model: {e}")
+            import traceback
+            traceback.print_exc()
+            topic_names = {i: f"Topic {i}" for i in range(num_topics)}
+        
+        # Check if topic column exists
+        df_working = df_reviews.copy()
+        has_topic_column = 'topic' in df_working.columns
+        
+        print(f"📋 Topic column exists: {has_topic_column}")
+        
+        # If 'topic' column doesn't exist, predict topics on-the-fly
+        if not has_topic_column:
+            print("\n📊 Topic column not found. Predicting topics on-the-fly...")
+            
+            if lda_model is None:
+                print("❌ Cannot predict topics: LDA model not available")
+                return jsonify({
+                    'topics': [],
+                    'summary': {
+                        'total_topics': 0,
+                        'total_reviews': len(df_reviews),
+                        'filter_applied': sentiment_filter,
+                        'message': 'LDA model not found. Please ensure Milestone 2 has been run to generate the topic model.',
+                        'error': True
+                    }
+                })
+            
+            # Predict topics for reviews
+            try:
+                print(f"📝 Processing {len(df_working)} reviews...")
+                
+                # Use the model's dictionary
+                dictionary = lda_model.id2word if hasattr(lda_model, 'id2word') and lda_model.id2word else None
+                print(f"📖 Dictionary available: {dictionary is not None}")
+                if dictionary:
+                    print(f"📖 Dictionary size: {len(dictionary)}")
+                
+                # Prepare documents - use simple tokenization
+                if 'cleaned_text' not in df_working.columns:
+                    print("❌ 'cleaned_text' column not found, using 'text' column")
+                    texts = df_working['text'].fillna('').astype(str).tolist()
+                else:
+                    texts = df_working['cleaned_text'].fillna('').astype(str).tolist()
+                
+                print(f"📄 Prepared {len(texts)} texts")
+                
+                # Simple tokenization (split by space) - same as regenerate_lda_model.py
+                processed_texts = [text.split() for text in texts if text.strip()]
+                print(f"✅ Tokenized {len(processed_texts)} documents")
+                
+                # Use the model's dictionary (id2word) - this is the dictionary used during training
+                if dictionary is None:
+                    from gensim import corpora
+                    print("⚠️  Model dictionary not found, creating new one...")
+                    dictionary = corpora.Dictionary(processed_texts)
+                    dictionary.filter_extremes(no_below=2, no_above=0.5)
+                    print(f"✅ Created dictionary with {len(dictionary)} words")
+                else:
+                    print(f"✅ Using model's dictionary with {len(dictionary)} words")
+                
+                # Predict topics for all reviews
+                print("🔮 Predicting topics for all reviews...")
+                topics = []
+                successful = 0
+                failed = 0
+                
+                for i, processed_text in enumerate(processed_texts):
+                    try:
+                        # Convert to bag-of-words using the model's dictionary
+                        bow = dictionary.doc2bow(processed_text)
+                        # Get topic distribution
+                        topic_dist = lda_model.get_document_topics(bow, minimum_probability=0.0)
+                        if topic_dist:
+                            # Get the topic with highest probability
+                            best_topic = max(topic_dist, key=lambda x: x[1])
+                            topics.append(best_topic[0])
+                            successful += 1
+                        else:
+                            # No topic found, assign to topic 0
+                            topics.append(0)
+                            failed += 1
+                    except Exception as e:
+                        # Error predicting, assign to topic 0
+                        topics.append(0)
+                        failed += 1
+                        if i < 5:  # Only log first few errors
+                            print(f"  ⚠️  Error on review {i}: {e}")
+                
+                print(f"✅ Topic prediction complete: {successful} successful, {failed} failed")
+                
+                df_working['topic'] = topics
+                topic_distribution = pd.Series(topics).value_counts().sort_index()
+                print(f"✅ Predicted topics for {len(topics)} reviews")
+                print(f"📊 Topic distribution:\n{topic_distribution}")
+                
+            except Exception as e:
+                print(f"❌ Error predicting topics: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({
+                    'topics': [],
+                    'summary': {
+                        'total_topics': 0,
+                        'total_reviews': len(df_reviews),
+                        'filter_applied': sentiment_filter,
+                        'message': f'Error predicting topics: {str(e)}',
+                        'error': True
+                    }
+                })
+        
+        # Calculate total counts
+        total_positive = (df_working['sentiment'] == 'positive').sum()
+        total_negative = (df_working['sentiment'] == 'negative').sum()
+        total_neutral = (df_working['sentiment'] == 'neutral').sum()
+        total_all = len(df_working)
+        
+        print(f"\n📊 Sentiment counts: +{total_positive} / -{total_negative} / ~{total_neutral}")
         
         # Filter by sentiment if specified
-        df_filtered = df_reviews.copy()
+        df_filtered = df_working.copy()
         if sentiment_filter != 'all':
             df_filtered = df_filtered[df_filtered['sentiment'] == sentiment_filter]
+            print(f"🔍 Filtered to {len(df_filtered)} reviews with sentiment: {sentiment_filter}")
         
         # Group by topic
+        print("📈 Grouping by topic...")
         topic_stats = df_filtered.groupby('topic').agg({
             'sentiment': ['count', lambda x: (x == 'positive').sum(), 
                          lambda x: (x == 'negative').sum(), 
@@ -1362,15 +1694,16 @@ def get_topic_sentiment():
         
         topic_stats.columns = ['topic', 'total', 'positive', 'negative', 'neutral']
         
+        print(f"✅ Found {len(topic_stats)} topics")
+        
         # Add topic names
         topic_stats['topic_name'] = topic_stats['topic'].map(lambda x: topic_names.get(x, f"Topic {x}"))
         
-        # Calculate percentages within topic
+        # Calculate percentages
         topic_stats['positive_pct'] = (topic_stats['positive'] / topic_stats['total'] * 100).round(1)
         topic_stats['negative_pct'] = (topic_stats['negative'] / topic_stats['total'] * 100).round(1)
         topic_stats['neutral_pct'] = (topic_stats['neutral'] / topic_stats['total'] * 100).round(1)
         
-        # Calculate percentage distribution (what % of all positive/negative/neutral come from each topic)
         if total_positive > 0:
             topic_stats['pct_of_all_positive'] = (topic_stats['positive'] / total_positive * 100).round(1)
         else:
@@ -1400,12 +1733,27 @@ def get_topic_sentiment():
             'total_neutral': int(total_neutral),
         }
         
-        return jsonify({
+        result = {
             'topics': topic_stats.to_dict('records'),
             'summary': summary
-        })
+        }
+        
+        print(f"✅ Returning {len(result['topics'])} topics")
+        print(f"{'='*60}\n")
+        
+        return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"❌ Fatal error in get_topic_sentiment: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'topics': [],
+            'summary': {
+                'message': f'Fatal error: {str(e)}',
+                'error': True
+            },
+            'error': str(e)
+        }), 500
 
 
 @app.route('/api/feedback', methods=['POST'])
@@ -1877,10 +2225,20 @@ if __name__ == '__main__':
     print("  Email: admin@business.com")
     print("  Password: admin123")
     print("\nUser Accounts (7 users):")
-    users = get_all_users()
-    for i, user in enumerate(users[1:], 1):
-        print(f"  User {i}: {user['email']} / user123")
+    try:
+        users = get_all_users()
+        for i, user in enumerate(users[1:], 1):
+            print(f"  User {i}: {user['email']} / user123")
+    except Exception as e:
+        print(f"  Warning: Could not list users: {e}")
     print("=" * 60 + "\n")
-    app.run(debug=True, port=5000)
+    try:
+        app.run(debug=True, port=5000, host='127.0.0.1', threaded=True, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n\nShutting down server...")
+    except Exception as e:
+        print(f"\n\nFatal error: {e}")
+        import traceback
+        traceback.print_exc()
 
 

@@ -1,375 +1,207 @@
 import React from 'react'
 import {
   Container,
-  Card,
-  CardContent,
   Typography,
   Box,
+  Card,
+  CardContent,
   Grid,
   Chip,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
 } from '@mui/material'
 import {
-  Analytics,
-  TrendingUp,
-  Insights,
-  Security,
-  Speed,
-  Support,
+  Business,
   Psychology,
-  AutoAwesome,
+  Timeline,
+  Insights,
+  Analytics,
+  Security,
 } from '@mui/icons-material'
-import { motion } from 'framer-motion'
 
 const About = () => {
   const features = [
     {
-      icon: <Analytics sx={{ fontSize: 40, color: '#5624d0' }} />,
-      title: 'Real-Time Analytics',
-      description: 'Get instant insights into customer sentiment and feedback trends with advanced data processing.',
+      icon: <Analytics sx={{ fontSize: 40 }} />,
+      title: 'Advanced Analytics',
+      description: 'Comprehensive sentiment analysis using multiple ML models including VADER, TextBlob, and Transformer-based approaches.',
     },
     {
-      icon: <TrendingUp sx={{ fontSize: 40, color: '#10b981' }} />,
-      title: 'Predictive Forecasting',
-      description: 'Leverage machine learning models to predict future sentiment trends and market behavior.',
+      icon: <Psychology sx={{ fontSize: 40 }} />,
+      title: 'Cognitive Computing',
+      description: 'Leveraging cognitive computing principles to understand and reason about customer feedback patterns.',
     },
     {
-      icon: <Insights sx={{ fontSize: 40, color: '#f59e0b' }} />,
-      title: 'Topic Discovery',
-      description: 'Automatically identify and categorize key themes in customer feedback using LDA topic modeling.',
+      icon: <Timeline sx={{ fontSize: 40 }} />,
+      title: 'Trend Forecasting',
+      description: 'Predictive analytics and sentiment trend forecasting powered by advanced machine learning models.',
     },
     {
-      icon: <Psychology sx={{ fontSize: 40, color: '#3b82f6' }} />,
-      title: 'Cognitive Intelligence',
-      description: 'Powered by four cognitive pillars: Understand, Reason, Learn, and Interact.',
+      icon: <Insights sx={{ fontSize: 40 }} />,
+      title: 'Topic Modeling',
+      description: 'Discover key topics and themes in customer feedback using LDA (Latent Dirichlet Allocation) topic modeling.',
     },
     {
-      icon: <Security sx={{ fontSize: 40, color: '#ef4444' }} />,
-      title: 'Secure & Private',
-      description: 'Enterprise-grade security with JWT authentication and data encryption.',
+      icon: <Business sx={{ fontSize: 40 }} />,
+      title: 'Business Intelligence',
+      description: 'Real-time business intelligence insights to help make data-driven decisions.',
     },
     {
-      icon: <Speed sx={{ fontSize: 40, color: '#8b5cf6' }} />,
-      title: 'High Performance',
-      description: 'Optimized for speed with efficient algorithms and real-time processing capabilities.',
-    },
-  ]
-
-  const pillars = [
-    {
-      name: 'Understand',
-      description: 'Natural Language Processing to interpret unstructured text from reviews and social media',
-      color: '#5624d0',
-    },
-    {
-      name: 'Reason',
-      description: 'Knowledge graphs and ML models to analyze sentiment, extract trends, and generate insights',
-      color: '#3b82f6',
-    },
-    {
-      name: 'Learn',
-      description: 'Active feedback loops and model refinement based on new data and user interactions',
-      color: '#10b981',
-    },
-    {
-      name: 'Interact',
-      description: 'Modern React interface with intuitive dashboards and interactive visualizations',
-      color: '#f59e0b',
+      icon: <Security sx={{ fontSize: 40 }} />,
+      title: 'Secure & Reliable',
+      description: 'Enterprise-grade security with JWT authentication and secure data handling.',
     },
   ]
 
   return (
-    <Container maxWidth="lg">
-      <Box mb={6} textAlign="center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Typography variant="h3" component="h1" gutterBottom fontWeight={700}>
-            About CENAnalytics
-          </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 800, mx: 'auto', mt: 2 }}>
-            A comprehensive cognitive computing system designed to help small businesses in Kampala, Uganda
-            understand customer sentiment, identify market trends, and make data-driven decisions.
-          </Typography>
-        </motion.div>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box textAlign="center" mb={6}>
+        <Typography variant="h3" component="h1" gutterBottom fontWeight={700} sx={{ mb: 2 }}>
+          About Business Intelligence Analyst
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 800, mx: 'auto' }}>
+          A comprehensive cognitive computing platform for analyzing customer sentiment,
+          discovering insights, and forecasting trends from business reviews.
+        </Typography>
       </Box>
 
-      {/* Features Grid */}
+      {/* Mission Statement */}
+      <Card sx={{ mb: 6, bgcolor: 'primary.main', color: 'white' }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom fontWeight={600}>
+            Our Mission
+          </Typography>
+          <Typography variant="body1" sx={{ fontSize: '1.1rem', lineHeight: 1.8 }}>
+            To empower businesses with intelligent sentiment analysis and predictive insights,
+            enabling them to understand customer feedback, identify trends, and make data-driven
+            decisions that drive growth and customer satisfaction.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Features */}
       <Box mb={6}>
-        <Typography variant="h5" fontWeight={600} gutterBottom mb={3}>
+        <Typography variant="h4" component="h2" gutterBottom fontWeight={600} textAlign="center" mb={4}>
           Key Features
         </Typography>
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {features.map((feature, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
+            <Grid item xs={12} md={4} key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4,
+                  },
+                }}
               >
-                <Card
-                  sx={{
-                    height: '100%',
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: 8,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Box mb={2}>{feature.icon}</Box>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-
-      {/* Cognitive Pillars */}
-      <Box mb={6}>
-        <Typography variant="h5" fontWeight={600} gutterBottom mb={3}>
-          Cognitive Computing Pillars
-        </Typography>
-        <Grid container spacing={3}>
-          {pillars.map((pillar, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.15 }}
-              >
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderLeft: `4px solid ${pillar.color}`,
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      boxShadow: 6,
-                      transform: 'translateX(4px)',
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={2} mb={2}>
-                      <Chip
-                        label={pillar.name}
-                        sx={{
-                          bgcolor: `${pillar.color}15`,
-                          color: pillar.color,
-                          fontWeight: 700,
-                          fontSize: '1rem',
-                          height: 36,
-                        }}
-                      />
-                    </Box>
-                    <Typography variant="body1" color="text.secondary">
-                      {pillar.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ color: 'primary.main', mb: 2 }}>
+                    {feature.icon}
+                  </Box>
+                  <Typography variant="h6" gutterBottom fontWeight={600}>
+                    {feature.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {feature.description}
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
           ))}
         </Grid>
       </Box>
 
       {/* Technology Stack */}
-      <Card>
-        <CardContent>
-          <Typography variant="h5" fontWeight={600} gutterBottom mb={3}>
+      <Card sx={{ mb: 6 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom fontWeight={600} mb={3}>
             Technology Stack
           </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" gutterBottom color="primary">
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom fontWeight={600} color="primary">
                 Frontend
               </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="React 18" secondary="Modern UI framework" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Material-UI" secondary="Component library" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Framer Motion" secondary="Animations" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Recharts" secondary="Data visualization" />
-                </ListItem>
-              </List>
+              <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                <Chip label="React" color="primary" variant="outlined" />
+                <Chip label="Material-UI" color="primary" variant="outlined" />
+                <Chip label="Recharts" color="primary" variant="outlined" />
+                <Chip label="Axios" color="primary" variant="outlined" />
+              </Box>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" gutterBottom color="primary">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom fontWeight={600} color="primary">
                 Backend
               </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Flask" secondary="REST API framework" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Python" secondary="Core language" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="JWT" secondary="Authentication" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Pandas/NumPy" secondary="Data processing" />
-                </ListItem>
-              </List>
+              <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                <Chip label="Python" color="secondary" variant="outlined" />
+                <Chip label="Flask" color="secondary" variant="outlined" />
+                <Chip label="Gensim" color="secondary" variant="outlined" />
+                <Chip label="Pandas" color="secondary" variant="outlined" />
+                <Chip label="NumPy" color="secondary" variant="outlined" />
+              </Box>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" gutterBottom color="primary">
-                AI/ML
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom fontWeight={600} color="primary">
+                Machine Learning
               </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="VADER/TextBlob" secondary="Sentiment analysis" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Gensim LDA" secondary="Topic modeling" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="NetworkX" secondary="Knowledge graphs" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AutoAwesome fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="scikit-learn" secondary="ML models" />
-                </ListItem>
-              </List>
+              <Box display="flex" flexWrap="wrap" gap={1}>
+                <Chip label="VADER" color="success" variant="outlined" />
+                <Chip label="TextBlob" color="success" variant="outlined" />
+                <Chip label="Transformers" color="success" variant="outlined" />
+                <Chip label="LDA" color="success" variant="outlined" />
+              </Box>
             </Grid>
           </Grid>
         </CardContent>
       </Card>
 
-      {/* Use Cases */}
-      <Box mb={6}>
-        <Typography variant="h5" fontWeight={600} gutterBottom mb={3}>
-          Use Cases
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', borderLeft: '4px solid #5624d0' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  Small Business Owners
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Understand customer satisfaction, identify service gaps, and make data-driven decisions to improve your business operations in Kampala.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', borderLeft: '4px solid #10b981' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  Marketing Teams
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Track brand sentiment across platforms, identify trending topics, and measure campaign effectiveness in real-time.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', borderLeft: '4px solid #f59e0b' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  Customer Service
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Proactively address customer concerns, prioritize issues by location and platform, and improve response times.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Box>
+      {/* System Architecture */}
+      <Card>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom fontWeight={600} mb={3}>
+            System Architecture
+          </Typography>
+          <Typography variant="body1" paragraph>
+            The Business Intelligence Analyst platform is built on a modern, scalable architecture
+            that separates concerns between frontend and backend components:
+          </Typography>
+          <Box component="ul" sx={{ pl: 4, '& li': { mb: 2 } }}>
+            <li>
+              <Typography variant="body1">
+                <strong>Frontend:</strong> React-based single-page application providing an intuitive
+                user interface for data visualization and interaction.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                <strong>Backend API:</strong> RESTful Flask API handling sentiment analysis, topic modeling,
+                and predictive analytics.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                <strong>Data Processing:</strong> Python-based data pipeline for cleaning, preprocessing,
+                and analyzing customer review data.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                <strong>ML Models:</strong> Ensemble approach combining multiple sentiment analysis
+                methods and LDA topic modeling for comprehensive insights.
+              </Typography>
+            </li>
+          </Box>
+        </CardContent>
+      </Card>
 
-      {/* Contact/Support */}
-      <Box mt={6} textAlign="center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card sx={{ bgcolor: 'primary.main', color: 'white' }}>
-            <CardContent sx={{ py: 4 }}>
-              <Support sx={{ fontSize: 48, mb: 2 }} />
-              <Typography variant="h5" fontWeight={600} gutterBottom>
-                Need Help?
-              </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.9, mb: 3 }}>
-                Our support team is here to help you get the most out of CENAnalytics platform
-              </Typography>
-              <Chip
-                label="Contact Support"
-                sx={{
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  height: 40,
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.3)',
-                  },
-                }}
-              />
-            </CardContent>
-          </Card>
-        </motion.div>
+      {/* Footer */}
+      <Box textAlign="center" mt={6}>
+        <Typography variant="body2" color="text.secondary">
+          Built with ❤️ using Cognitive Computing principles
+        </Typography>
       </Box>
     </Container>
   )

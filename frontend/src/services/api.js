@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
@@ -80,16 +80,45 @@ export const apiService = {
       const response = await api.get('/topics')
       // Handle both array and object responses
       if (Array.isArray(response.data)) {
-        return response.data
-      } else if (response.data.topics && Array.isArray(response.data.topics)) {
-        return response.data.topics
+        // Direct array response - empty array means no topics loaded
+        if (response.data.length > 0) {
+          return response.data
+        } else {
+          // Empty array - return error object so component can display it
+          return { 
+            topics: [], 
+            error: 'No topics available',
+            message: 'The topic model file exists but no topics could be extracted. Please ensure Milestone 2 notebook has been run successfully to regenerate the model.'
+          }
+        }
+      } else if (response.data && typeof response.data === 'object') {
+        // Object response - could have topics array or error
+        if (Array.isArray(response.data.topics)) {
+          if (response.data.topics.length > 0) {
+            return response.data.topics // Return array directly
+          } else {
+            // Empty topics array - return error object so component can display it
+            return { 
+              topics: [], 
+              error: response.data.error || response.data.message || 'No topics available',
+              message: response.data.message || response.data.error
+            }
+          }
+        } else if (response.data.error) {
+          // Error object without topics array
+          return { 
+            topics: [], 
+            error: response.data.error,
+            message: response.data.message || response.data.error
+          }
+        } else {
+          // Unknown structure - return as is
+          return response.data
+        }
       }
-      return response.data
+      return { topics: [], error: 'Unknown response format' }
     } catch (error) {
-      // If error response has topics array, return it
-      if (error.response?.data?.topics && Array.isArray(error.response.data.topics)) {
-        return error.response.data.topics
-      }
+      // Re-throw network/HTTP errors
       throw error
     }
   },
@@ -148,6 +177,3 @@ export const apiService = {
 }
 
 export default api
-
-
-

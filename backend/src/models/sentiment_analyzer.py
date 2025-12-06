@@ -1,7 +1,16 @@
-"""
+﻿"""
 Enhanced Sentiment Analysis Module for Small Business Intelligence Analyst
 Implements multiple sentiment analysis approaches with robustness improvements
 """
+
+import sys
+import io
+# Set UTF-8 encoding for stdout/stderr to handle emoji characters
+# Only wrap if buffer attribute exists (not available in Jupyter notebooks)
+if sys.stdout.encoding != 'utf-8' and hasattr(sys.stdout, 'buffer'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8' and hasattr(sys.stderr, 'buffer'):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 import pandas as pd
 import numpy as np
@@ -37,7 +46,7 @@ class SentimentAnalyzer:
             self.vader_analyzer = SentimentIntensityAnalyzer()
             self.vader_available = True
         except Exception as e:
-            print(f"⚠️ VADER not available: {e}")
+            print(f"âš ï¸ VADER not available: {e}")
             self.vader_available = False
         
         self.textblob_available = True  # TextBlob doesn't need initialization
@@ -49,10 +58,10 @@ class SentimentAnalyzer:
                                         model="nlptown/bert-base-multilingual-uncased-sentiment")
                 self.transformer_available = True
             except Exception as e:
-                print(f"⚠️ Transformer model not available: {e}")
+                print(f"âš ï¸ Transformer model not available: {e}")
                 self.transformer_available = False
         elif (method == 'transformer' or use_ensemble) and not TRANSFORMERS_AVAILABLE:
-            print("⚠️ Transformers library not installed. Transformer-based sentiment analysis will be disabled.")
+            print("âš ï¸ Transformers library not installed. Transformer-based sentiment analysis will be disabled.")
             self.transformer_available = False
         
         # Sarcasm detection patterns
@@ -580,7 +589,7 @@ class SentimentAnalyzer:
         if self.method == 'vader':
             if not self.vader_available:
                 # Fallback to TextBlob if VADER not available
-                print("⚠️  VADER not available, falling back to TextBlob")
+                print("âš ï¸  VADER not available, falling back to TextBlob")
                 return self.analyze_textblob(text)
             return self.analyze_vader(text)
         elif self.method == 'textblob':
@@ -588,14 +597,14 @@ class SentimentAnalyzer:
         elif self.method == 'transformer':
             if not self.transformer_available:
                 # Fallback to VADER if transformer not available
-                print("⚠️  Transformer not available, falling back to VADER")
+                print("âš ï¸  Transformer not available, falling back to VADER")
                 if self.vader_available:
                     result = self.analyze_vader(text)
                     result['warning'] = 'Transformer method not available. Results shown using VADER instead.'
                     return result
                 else:
                     # Fallback to TextBlob if VADER also not available
-                    print("⚠️  VADER also not available, falling back to TextBlob")
+                    print("âš ï¸  VADER also not available, falling back to TextBlob")
                     result = self.analyze_textblob(text)
                     result['warning'] = 'Transformer method not available. Results shown using TextBlob instead.'
                     return result
@@ -643,7 +652,7 @@ class SentimentAnalyzer:
                 errors.append((i, str(e)))
         
         if errors and show_progress:
-            print(f"⚠️ Encountered {len(errors)} errors during batch processing")
+            print(f"âš ï¸ Encountered {len(errors)} errors during batch processing")
         
         df_results = pd.DataFrame(results)
         
@@ -652,4 +661,3 @@ class SentimentAnalyzer:
             df_results['has_error'] = df_results['error'].notna()
         
         return df_results
-

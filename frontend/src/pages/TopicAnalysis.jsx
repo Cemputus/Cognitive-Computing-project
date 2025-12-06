@@ -52,24 +52,71 @@ const TopicAnalysis = () => {
       
       // Handle both array and object responses
       if (Array.isArray(data)) {
-        setTopics(data)
-      } else if (data && Array.isArray(data.topics)) {
-        setTopics(data.topics)
-      } else if (data && data.error) {
-        setError(data.error)
-        setTopics([])
+        // Direct array response
+        if (data.length > 0) {
+          setTopics(data)
+          setError(null)
+        } else {
+          setTopics([])
+          setError('No topics available. Please ensure Milestone 2 notebook has been run.')
+        }
+      } else if (data && typeof data === 'object') {
+        // Object response
+        if (Array.isArray(data.topics)) {
+          if (data.topics.length > 0) {
+            setTopics(data.topics)
+            setError(null)
+          } else {
+            // Empty topics array - show error message from backend
+            setTopics([])
+            setError(data.message || data.error || 'No topics available. Please ensure Milestone 2 notebook has been run.')
+          }
+        } else if (data.error) {
+          // Error object - display the message
+          setTopics([])
+          setError(data.message || data.error)
+        } else {
+          // Unknown structure
+          setTopics([])
+          setError('Unknown response format from server.')
+        }
       } else {
         setTopics([])
+        setError('No topics data received from server.')
       }
     } catch (err) {
       console.error('Error fetching topics:', err)
-      const errorMessage = err.response?.data?.error || err.message || 'Failed to load topics'
-      setError(errorMessage)
-      // If error response has topics, still show them
-      if (err.response?.data?.topics && Array.isArray(err.response.data.topics)) {
-        setTopics(err.response.data.topics)
+      let errorMessage = 'Failed to load topics'
+      let errorDetails = ''
+      
+      if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error') || err.message?.includes('Cannot connect')) {
+        errorMessage = 'Cannot connect to server'
+        errorDetails = 'Please ensure the backend is running on http://localhost:5000'
+      } else if (err.response) {
+        // Server responded with error status (could be 200 with error in body)
+        const responseData = err.response.data
+        errorMessage = responseData?.error || responseData?.message || errorMessage
+        errorDetails = responseData?.message || responseData?.error || ''
+        
+        // If error response has topics array, check if it's empty or has data
+        if (responseData?.topics && Array.isArray(responseData.topics)) {
+          if (responseData.topics.length > 0) {
+            setTopics(responseData.topics)
+            setError(null) // Clear error if we have topics to display
+          } else {
+            // Empty topics array - show the error message
+            setTopics([])
+            setError(errorDetails || errorMessage)
+          }
+        } else {
+          // No topics array - show error
+          setTopics([])
+          setError(errorDetails || errorMessage)
+        }
       } else {
+        errorMessage = err.message || errorMessage
         setTopics([])
+        setError(errorMessage)
       }
     } finally {
       setLoading(false)
@@ -112,12 +159,36 @@ const TopicAnalysis = () => {
       </Box>
 
       {error && topics.length === 0 && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          {error}
+        <Alert 
+          severity={error.includes('Cannot connect') ? 'error' : 'warning'} 
+          sx={{ mb: 3 }}
+          action={
+            <IconButton
+              size="small"
+              color="inherit"
+              onClick={fetchTopics}
+            >
+              <Refresh />
+            </IconButton>
+          }
+        >
+          <Typography variant="body1" fontWeight={600} gutterBottom>
+            {error.includes('Cannot connect') ? 'Connection Error' : 
+             error.includes('Version Mismatch') ? 'Model Version Mismatch' :
+             'No Topics Available'}
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ whiteSpace: 'pre-line' }}>
+            {error}
+          </Typography>
+          {error.includes('Cannot connect') && (
+            <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+              Make sure the backend server is running. You can start it by running: <code>python backend_api.py</code> in the backend directory.
+            </Typography>
+          )}
         </Alert>
       )}
 
-      {topics.length === 0 && !loading && (
+      {topics.length === 0 && !loading && !error && (
         <Card>
           <CardContent>
             <Box textAlign="center" py={4}>
@@ -125,7 +196,7 @@ const TopicAnalysis = () => {
                 No Topics Available
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Topic models are being generated. Please check back shortly or ensure Milestone 2 notebook has been run.
+                Please ensure Milestone 2 notebook has been run to generate topic models.
               </Typography>
             </Box>
           </CardContent>

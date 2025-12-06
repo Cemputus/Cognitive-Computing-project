@@ -201,9 +201,11 @@ const SentimentAnalysis = () => {
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Copy">
-                    <IconButton size="small" onClick={handleCopy} disabled={!text}>
-                      <ContentCopy fontSize="small" />
-                    </IconButton>
+                    <span>
+                      <IconButton size="small" onClick={handleCopy} disabled={!text}>
+                        <ContentCopy fontSize="small" />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </Box>
               </Box>

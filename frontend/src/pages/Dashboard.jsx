@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import {
   Container,
   Grid,
@@ -76,7 +76,7 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    fetchAllData(true)
+    fetchAllData()
   }, [])
 
   useEffect(() => {
@@ -91,11 +91,9 @@ const Dashboard = () => {
     fetchTopicData()
   }, [topicFilter])
 
-  const fetchAllData = async (showLoading = false) => {
+  const fetchAllData = async () => {
     try {
-      if (showLoading) {
-        setLoading(true)
-      }
+      setLoading(true)
       const [statsData, locData, platData, topData] = await Promise.all([
         apiService.getDashboardStats(),
         apiService.getLocationSentiment('all'),
@@ -110,9 +108,7 @@ const Dashboard = () => {
     } catch (err) {
       setError(err.message || 'Failed to load dashboard data')
     } finally {
-      if (showLoading) {
-        setLoading(false)
-      }
+      setLoading(false)
     }
   }
 
@@ -138,65 +134,35 @@ const Dashboard = () => {
 
   const fetchTopicData = async () => {
     try {
+      console.log('📊 Fetching topic data with filter:', topicFilter)
       const data = await apiService.getTopicSentiment(topicFilter)
+      console.log('📊 Topic data received:', {
+        hasTopics: !!data?.topics,
+        topicCount: data?.topics?.length || 0,
+        summary: data?.summary,
+        fullData: data
+      })
       setTopicData(data)
     } catch (err) {
-      console.error('Error fetching topic data:', err)
+      console.error('❌ Error fetching topic data:', err)
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      })
     }
   }
 
-  const handleRefresh = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      await Promise.all([
-        fetchAllData(false),
-        fetchLocationData(),
-        fetchPlatformData(),
-        fetchTopicData()
-      ])
-      setSnackbar({
-        open: true,
-        message: 'Data refreshed successfully!',
-        severity: 'success'
-      })
-    } catch (err) {
-      setSnackbar({
-        open: true,
-        message: 'Failed to refresh data: ' + (err.message || 'Unknown error'),
-        severity: 'error'
-      })
-    } finally {
-      setLoading(false)
-    }
+  const handleRefresh = () => {
+    fetchAllData()
+    fetchLocationData()
+    fetchPlatformData()
+    fetchTopicData()
   }
 
   const handleExportReport = async () => {
     try {
-      setLoading(true)
       const response = await apiService.exportReport('dashboard')
-      
-      // Download PDF
-      if (response.pdf && response.filename) {
-        // Convert base64 to blob
-        const byteCharacters = atob(response.pdf)
-        const byteNumbers = new Array(byteCharacters.length)
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i)
-        }
-        const byteArray = new Uint8Array(byteNumbers)
-        const blob = new Blob([byteArray], { type: 'application/pdf' })
-        
-        // Create download link
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = response.filename || 'CENAnalytics_Report.pdf'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      }
       
       // Refresh notifications to get new ones
       await fetchNotifications()
@@ -204,7 +170,7 @@ const Dashboard = () => {
       // Show success message
       setSnackbar({
         open: true,
-        message: 'Report exported successfully! PDF downloaded and a copy has been sent to ensubuga019@gmail.com',
+        message: 'Report exported successfully! A copy has been sent to ensubuga019@gmail.com',
         severity: 'success'
       })
     } catch (err) {
@@ -213,8 +179,6 @@ const Dashboard = () => {
         message: 'Failed to export report: ' + (err.message || 'Unknown error'),
         severity: 'error'
       })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -229,50 +193,9 @@ const Dashboard = () => {
   }
 
   if (error && !stats) {
-    const isNetworkError = error.toLowerCase().includes('network') || 
-                          error.toLowerCase().includes('cannot connect') ||
-                          error.toLowerCase().includes('no response')
-    
     return (
-      <Container sx={{ mt: 4 }}>
-        <Alert 
-          severity="error" 
-          sx={{ mb: 2 }}
-          action={
-            <IconButton
-              color="inherit"
-              size="small"
-              onClick={() => fetchAllData(true)}
-            >
-              <Refresh />
-            </IconButton>
-          }
-        >
-          {error}
-        </Alert>
-        {isNetworkError && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Troubleshooting Steps:
-            </Typography>
-            <Typography variant="body2" component="div">
-              1. Make sure the backend server is running on port 5000
-              <br />
-              2. Check the backend terminal for any error messages
-              <br />
-              3. Verify you are logged in (check if you have a valid token)
-              <br />
-              4. Try refreshing the page or clicking the refresh button above
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 2, fontWeight: 'bold' }}>
-              To start the backend:
-            </Typography>
-            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', mt: 1, p: 1, bgcolor: '#f1f5f9', borderRadius: 1, color: '#1a202c', border: '1px solid #e2e8f0' }}>
-              cd backend<br />
-              python backend_api.py
-            </Typography>
-          </Alert>
-        )}
+      <Container>
+        <Alert severity="error">{error}</Alert>
       </Container>
     )
   }
@@ -372,6 +295,11 @@ const Dashboard = () => {
 
   // Prepare topic chart data with meaningful names
   // When filter is applied, show percentage of all filtered sentiment from each topic
+  console.log('🔍 Preparing topic chart data. topicData:', {
+    hasTopicData: !!topicData,
+    topicsArray: topicData?.topics,
+    topicsLength: topicData?.topics?.length || 0
+  })
   const topicChartData = (topicData?.topics || []).map((topic) => {
     const topicName = topic.topic_name || `Topic ${topic.topic}`
     if (topicFilter !== 'all') {
@@ -414,14 +342,14 @@ const Dashboard = () => {
   })) || []
 
   return (
-    <Container maxWidth="xl" sx={{ pb: 3 }}>
+    <Container maxWidth="xl" sx={{ pb: 0 }}>
       {/* Header */}
       <Box mb={4} display="flex" justifyContent="space-between" alignItems="center">
         <Box>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight={700} sx={{ color: '#1a202c' }}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
             Analytics Dashboard
           </Typography>
-          <Typography variant="body1" sx={{ color: '#4a5568' }}>
+          <Typography variant="body1" color="text.secondary">
             Comprehensive business intelligence insights and sentiment analysis
           </Typography>
         </Box>
@@ -451,14 +379,12 @@ const Dashboard = () => {
               <Card
                 sx={{
                   height: '100%',
-                  background: `linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)`,
-                  border: `2px solid ${stat.color}20`,
+                  background: `linear-gradient(135deg, ${stat.color}15 0%, ${stat.color}05 100%)`,
+                  border: `1px solid ${stat.color}30`,
                   transition: 'transform 0.2s, box-shadow 0.2s',
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.07)',
                   '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 28px ${stat.color}30`,
-                    borderColor: stat.color,
+                    boxShadow: `0 8px 24px ${stat.color}40`,
                   },
                 }}
               >
@@ -497,7 +423,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* Location-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
+      <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box display="flex" alignItems="center" gap={2}>
@@ -550,7 +476,7 @@ const Dashboard = () => {
                     <YAxis tick={{ fontSize: 12 }} />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
                         border: '1px solid #e5e7eb',
                         borderRadius: 8,
                       }}
@@ -615,7 +541,7 @@ const Dashboard = () => {
                   variant="outlined"
                 />
                 <Chip
-                  label={`Total Reviews: ${locationData.summary?.total_reviews?.toLocaleString() || 0}`}
+                  label={`Total Reviews: ${(locationData.summary?.total_reviews || 0).toLocaleString()}`}
                   color="primary"
                   variant="outlined"
                 />
@@ -627,7 +553,7 @@ const Dashboard = () => {
                   />
                 )}
               </Box>
-              {locationFilter !== 'all' && locationData.summary[`total_${locationFilter}`] > 0 && (
+              {locationFilter !== 'all' && locationData.summary?.[`total_${locationFilter}`] > 0 && (
                 <Typography variant="body2" color="text.secondary" mt={1}>
                   <strong>Distribution:</strong> Showing what percentage of all {locationFilter} reviews come from each location.
                 </Typography>
@@ -638,7 +564,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Platform-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
+      <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box display="flex" alignItems="center" gap={2}>
@@ -678,7 +604,7 @@ const Dashboard = () => {
                     <YAxis tick={{ fontSize: 12 }} />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
                         border: '1px solid #e5e7eb',
                         borderRadius: 8,
                       }}
@@ -745,7 +671,7 @@ const Dashboard = () => {
                   variant="outlined"
                 />
                 <Chip
-                  label={`Total Reviews: ${platformData.summary?.total_reviews?.toLocaleString() || 0}`}
+                  label={`Total Reviews: ${(platformData.summary?.total_reviews || 0).toLocaleString()}`}
                   color="primary"
                   variant="outlined"
                 />
@@ -757,7 +683,7 @@ const Dashboard = () => {
                   />
                 )}
               </Box>
-              {platformFilter !== 'all' && platformData.summary[`total_${platformFilter}`] > 0 && (
+              {platformFilter !== 'all' && platformData.summary?.[`total_${platformFilter}`] > 0 && (
                 <Typography variant="body2" color="text.secondary" mt={1}>
                   <strong>Distribution:</strong> Showing what percentage of all {platformFilter} reviews come from each platform.
                 </Typography>
@@ -768,9 +694,9 @@ const Dashboard = () => {
       </Card>
 
       {/* Topic-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Card sx={{ mb: 0 }}>
+        <CardContent sx={{ pt: 2, px: 3, pb: 0, '&:last-child': { pb: 0 } }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Box display="flex" alignItems="center" gap={2}>
               <TopicIcon color="primary" sx={{ fontSize: 32 }} />
               <Box>
@@ -798,71 +724,105 @@ const Dashboard = () => {
             </FormControl>
           </Box>
 
-          <Box height={400}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topicChartData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis type="number" tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} />
-                <RechartsTooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                  }}
-                  formatter={(value, name, props) => {
-                    if (topicFilter !== 'all') {
-                      return [`${typeof value === 'number' ? value.toFixed(1) : value}% of all ${topicFilter} reviews`, name]
-                    }
-                    return [typeof value === 'number' ? value.toFixed(1) + '%' : value + '%', name]
-                  }}
-                />
-                <Legend />
-                {topicFilter === 'all' ? (
-                  <>
-                    <Bar dataKey="Positive" fill={COLORS.positive} radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="Negative" fill={COLORS.negative} radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="Neutral" fill={COLORS.neutral} radius={[0, 4, 4, 0]} />
-                  </>
-                ) : (
-                  <Bar 
-                    dataKey="Value" 
-                    fill={COLORS[topicFilter]} 
-                    radius={[0, 4, 4, 0]}
-                    name={`% of All ${topicFilter.charAt(0).toUpperCase() + topicFilter.slice(1)}`}
-                  />
-                )}
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-
-          {topicData?.summary && (
-            <Box mt={2}>
-              <Box display="flex" gap={2} flexWrap="wrap" mb={1}>
-                <Chip
-                  label={`Total Topics: ${topicData.summary?.total_topics || 0}`}
-                  color="primary"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Total Reviews: ${topicData.summary?.total_reviews?.toLocaleString() || 0}`}
-                  color="primary"
-                  variant="outlined"
-                />
-                {topicFilter !== 'all' && (
-                  <Chip
-                    label={`Filter: ${topicFilter}`}
-                    color="secondary"
-                    variant="outlined"
-                  />
-                )}
-              </Box>
-              {topicFilter !== 'all' && topicData.summary?.[`total_${topicFilter}`] > 0 && (
-                <Typography variant="body2" color="text.secondary" mt={1}>
-                  <strong>Distribution:</strong> Showing what percentage of all {topicFilter} reviews come from each topic.
+          {topicChartData.length === 0 ? (
+            <Box p={2} textAlign="center">
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                No topic data available.
+              </Typography>
+              {topicData?.summary?.message && (
+                <Typography variant="caption" color="error" display="block" sx={{ mt: 1 }}>
+                  {topicData.summary.message}
                 </Typography>
               )}
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                {topicData?.summary?.message 
+                  ? "Please check the backend logs for more details."
+                  : "Try selecting a different sentiment filter or check back later."}
+              </Typography>
             </Box>
+          ) : (
+            <>
+              <Box height={400}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={topicChartData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis 
+                      type="number" 
+                      tick={{ fontSize: 12 }} 
+                      label={{ value: 'Percentage (%)', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
+                    />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      tick={{ fontSize: 11 }} 
+                      width={150}
+                      interval={0}
+                    />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: 8,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      }}
+                      formatter={(value, name, props) => {
+                        if (topicFilter !== 'all') {
+                          return [`${typeof value === 'number' ? value.toFixed(1) : value}% of all ${topicFilter} reviews`, name]
+                        }
+                        return [typeof value === 'number' ? value.toFixed(1) + '%' : value + '%', name]
+                      }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                    {topicFilter === 'all' ? (
+                      <>
+                        <Bar dataKey="Positive" fill={COLORS.positive} radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="Negative" fill={COLORS.negative} radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="Neutral" fill={COLORS.neutral} radius={[0, 4, 4, 0]} />
+                      </>
+                    ) : (
+                      <Bar 
+                        dataKey="Value" 
+                        fill={COLORS[topicFilter] || COLORS.positive} 
+                        radius={[0, 4, 4, 0]}
+                        name={`% of All ${topicFilter.charAt(0).toUpperCase() + topicFilter.slice(1)}`}
+                      />
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+
+              {topicData?.summary && (
+                <Box mt={0.5} mb={0} pb={0}>
+                  <Box display="flex" gap={2} flexWrap="wrap">
+                    <Chip
+                      label={`Total Topics: ${topicData.summary?.total_topics || 0}`}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                    />
+                    <Chip
+                      label={`Total Reviews: ${(topicData.summary?.total_reviews || 0).toLocaleString()}`}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                    />
+                    {topicFilter !== 'all' && (
+                      <Chip
+                        label={`Filter: ${topicFilter}`}
+                        color="secondary"
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
+                  </Box>
+                  {topicFilter !== 'all' && topicData.summary?.[`total_${topicFilter}`] > 0 && (
+                    <Typography variant="body2" color="text.secondary" mt={0.5} sx={{ fontSize: '0.8rem' }}>
+                      <strong>Distribution:</strong> Showing what percentage of all {topicFilter} reviews come from each topic.
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -874,11 +834,7 @@ const Dashboard = () => {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
