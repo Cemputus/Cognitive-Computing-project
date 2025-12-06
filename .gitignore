@@ -24,6 +24,11 @@ data/models/*.pkl
 data/models/*.h5
 data/models/*.pt
 
+# Backend model files (too large for GitHub)
+backend/data/models/*.pkl
+backend/data/models/*.h5
+backend/data/models/*.pt
+
 # Environment variables
 .env
 .env.local
