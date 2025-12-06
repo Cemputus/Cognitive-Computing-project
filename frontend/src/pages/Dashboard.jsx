@@ -52,6 +52,7 @@ import {
 import { apiService } from '../services/api'
 import { motion } from 'framer-motion'
 import { useNotifications } from '../contexts/NotificationContext'
+import { useSearch } from '../contexts/SearchContext'
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null)
@@ -66,7 +67,7 @@ const Dashboard = () => {
   const [platformFilter, setPlatformFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' })
-  const [searchQuery, setSearchQuery] = useState('')
+  const { searchQuery } = useSearch()
   const { fetchNotifications } = useNotifications()
 
   const COLORS = {
@@ -342,7 +343,7 @@ const Dashboard = () => {
   })) || []
 
   return (
-    <Container maxWidth="xl" sx={{ pb: 0 }}>
+    <Container maxWidth="xl" sx={{ pb: '0 !important', paddingBottom: '0 !important' }}>
       {/* Header */}
       <Box mb={4} display="flex" justifyContent="space-between" alignItems="center">
         <Box>
@@ -694,8 +695,8 @@ const Dashboard = () => {
       </Card>
 
       {/* Topic-Based Sentiment Analysis */}
-      <Card sx={{ mb: 0 }}>
-        <CardContent sx={{ pt: 2, px: 3, pb: 0, '&:last-child': { pb: 0 } }}>
+      <Card sx={{ mb: 0, pb: 0, marginBottom: '0 !important', paddingBottom: '0 !important' }}>
+        <CardContent sx={{ pt: 2, px: 3, pb: '0 !important', '&:last-child': { pb: '0 !important', paddingBottom: '0 !important' } }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Box display="flex" alignItems="center" gap={2}>
               <TopicIcon color="primary" sx={{ fontSize: 32 }} />
@@ -742,9 +743,9 @@ const Dashboard = () => {
             </Box>
           ) : (
             <>
-              <Box height={400}>
+              <Box height={380} sx={{ marginBottom: '0 !important' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={topicChartData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                  <BarChart data={topicChartData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis 
                       type="number" 
@@ -792,19 +793,21 @@ const Dashboard = () => {
               </Box>
 
               {topicData?.summary && (
-                <Box mt={0.5} mb={0} pb={0}>
-                  <Box display="flex" gap={2} flexWrap="wrap">
+                <Box mt={0.5} mb={0} pb={0} sx={{ marginTop: '4px', marginBottom: '0 !important', paddingBottom: '0 !important' }}>
+                  <Box display="flex" gap={2} flexWrap="wrap" sx={{ marginBottom: '0 !important', paddingBottom: '0 !important' }}>
                     <Chip
                       label={`Total Topics: ${topicData.summary?.total_topics || 0}`}
                       color="primary"
                       variant="outlined"
                       size="small"
+                      sx={{ marginBottom: '0 !important' }}
                     />
                     <Chip
                       label={`Total Reviews: ${(topicData.summary?.total_reviews || 0).toLocaleString()}`}
                       color="primary"
                       variant="outlined"
                       size="small"
+                      sx={{ marginBottom: '0 !important' }}
                     />
                     {topicFilter !== 'all' && (
                       <Chip
@@ -812,11 +815,12 @@ const Dashboard = () => {
                         color="secondary"
                         variant="outlined"
                         size="small"
+                        sx={{ marginBottom: '0 !important' }}
                       />
                     )}
                   </Box>
                   {topicFilter !== 'all' && topicData.summary?.[`total_${topicFilter}`] > 0 && (
-                    <Typography variant="body2" color="text.secondary" mt={0.5} sx={{ fontSize: '0.8rem' }}>
+                    <Typography variant="body2" color="text.secondary" mt={0.5} mb={0} sx={{ fontSize: '0.8rem', marginBottom: '0 !important', paddingBottom: '0 !important' }}>
                       <strong>Distribution:</strong> Showing what percentage of all {topicFilter} reviews come from each topic.
                     </Typography>
                   )}

@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
+import { useSearch } from '../contexts/SearchContext'
 import logoImage from '../images/CENAnalytics logo.png'
 
 const Navbar = () => {
@@ -41,6 +42,7 @@ const Navbar = () => {
   const location = useLocation()
   const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const { unreadCount } = useNotifications()
+  const { searchQuery, updateSearchQuery } = useSearch()
   const [anchorEl, setAnchorEl] = useState(null)
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -211,6 +213,8 @@ const Navbar = () => {
               </Box>
               <InputBase
                 placeholder="Search analytics..."
+                value={searchQuery}
+                onChange={(e) => updateSearchQuery(e.target.value)}
                 sx={{
                   color: 'text.primary',
                   width: '100%',

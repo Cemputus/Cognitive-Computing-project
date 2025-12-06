@@ -196,13 +196,6 @@ const About = () => {
           </Box>
         </CardContent>
       </Card>
-
-      {/* Footer */}
-      <Box textAlign="center" mt={6}>
-        <Typography variant="body2" color="text.secondary">
-          Built with ❤️ using Cognitive Computing principles
-        </Typography>
-      </Box>
     </Container>
   )
 }

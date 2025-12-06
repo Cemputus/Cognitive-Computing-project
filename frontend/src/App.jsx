@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Box, CircularProgress } from '@mui/material'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { SearchProvider } from './contexts/SearchContext'
 import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
@@ -139,7 +140,9 @@ function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <AppRoutes />
+        <SearchProvider>
+          <AppRoutes />
+        </SearchProvider>
       </NotificationProvider>
     </AuthProvider>
   )

@@ -48,7 +48,7 @@ tmp/
 temp/
 *.tmp
 
-#node modules
+# Node modules
 node_modules/
 
 
