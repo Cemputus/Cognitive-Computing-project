@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Container,
   Card,
@@ -15,7 +15,12 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
+import { useAuth } from '../contexts/AuthContext'
 import {
   Send as SendIcon,
   ContentCopy,
@@ -25,6 +30,7 @@ import {
   SentimentSatisfiedAlt,
   SentimentNeutral,
   SentimentDissatisfied,
+  Topic as TopicIcon,
 } from '@mui/icons-material'
 import {
   RadialBarChart,
@@ -38,11 +44,46 @@ import { apiService } from '../services/api'
 import { motion } from 'framer-motion'
 
 const SentimentAnalysis = () => {
+  const { user } = useAuth()
   const [text, setText] = useState('')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [history, setHistory] = useState([])
+  const [method, setMethod] = useState('ensemble')
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    if (user?.id) {
+      const storageKey = `sentiment_history_${user.id}`
+      try {
+        const savedHistory = localStorage.getItem(storageKey)
+        if (savedHistory) {
+          const parsed = JSON.parse(savedHistory)
+          // Convert timestamp strings back to Date objects
+          const historyWithDates = parsed.map(item => ({
+            ...item,
+            timestamp: new Date(item.timestamp)
+          }))
+          setHistory(historyWithDates)
+        }
+      } catch (err) {
+        console.error('Error loading history from localStorage:', err)
+      }
+    }
+  }, [user?.id])
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    if (user?.id && history.length > 0) {
+      const storageKey = `sentiment_history_${user.id}`
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(history))
+      } catch (err) {
+        console.error('Error saving history to localStorage:', err)
+      }
+    }
+  }, [history, user?.id])
 
   const handleAnalyze = async () => {
     if (!text.trim()) {
@@ -53,12 +94,28 @@ const SentimentAnalysis = () => {
     setLoading(true)
     setError(null)
     try {
-      const analysis = await apiService.analyzeSentiment(text)
+      const analysis = await apiService.analyzeSentiment(text, method)
       setResult(analysis)
-      // Add to history
-      setHistory([{ text, result: analysis, timestamp: new Date() }, ...history.slice(0, 4)])
+      // Add to history (keep last 10 items)
+      const newHistoryItem = { text, result: analysis, timestamp: new Date(), method }
+      setHistory([newHistoryItem, ...history.slice(0, 9)])
     } catch (err) {
-      setError(err.message || 'Failed to analyze sentiment')
+      console.error('Sentiment analysis error:', err)
+      // Handle different error types
+      if (err.response && err.response.data) {
+        const errorData = err.response.data
+        if (errorData.error) {
+          setError(errorData.error)
+        } else if (errorData.message) {
+          setError(errorData.message)
+        } else {
+          setError('Failed to analyze sentiment. Please try again.')
+        }
+      } else if (err.message) {
+        setError(err.message)
+      } else {
+        setError('Failed to connect to server. Please ensure the backend is running.')
+      }
     } finally {
       setLoading(false)
     }
@@ -151,6 +208,21 @@ const SentimentAnalysis = () => {
                 </Box>
               </Box>
               <Divider sx={{ mb: 2 }} />
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel id="method-select-label">Analysis Method</InputLabel>
+                <Select
+                  labelId="method-select-label"
+                  id="method-select"
+                  value={method}
+                  label="Analysis Method"
+                  onChange={(e) => setMethod(e.target.value)}
+                >
+                  <MenuItem value="ensemble">Ensemble (Recommended)</MenuItem>
+                  <MenuItem value="vader">VADER</MenuItem>
+                  <MenuItem value="textblob">TextBlob</MenuItem>
+                  <MenuItem value="transformer">Transformer</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 multiline
@@ -211,17 +283,39 @@ Example:
                       onClick={() => {
                         setText(item.text)
                         setResult(item.result)
+                        if (item.method) {
+                          setMethod(item.method)
+                        }
                       }}
                     >
                       <Box display="flex" justifyContent="space-between" alignItems="start" mb={1}>
-                        <Chip
-                          label={item.result.sentiment}
-                          size="small"
-                          color={getSentimentColor(item.result.sentiment)}
-                          sx={{ fontWeight: 600 }}
-                        />
+                        <Box display="flex" gap={1} flexWrap="wrap">
+                          <Chip
+                            label={item.result.sentiment}
+                            size="small"
+                            color={getSentimentColor(item.result.sentiment)}
+                            sx={{ fontWeight: 600 }}
+                          />
+                          {item.result.topic_name && (
+                            <Chip
+                              label={item.result.topic_name}
+                              size="small"
+                              color="info"
+                              icon={<TopicIcon sx={{ fontSize: 16 }} />}
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          )}
+                          {item.method && (
+                            <Chip
+                              label={item.method}
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          )}
+                        </Box>
                         <Typography variant="caption" color="text.secondary">
-                          {item.timestamp.toLocaleTimeString()}
+                          {new Date(item.timestamp).toLocaleTimeString()}
                         </Typography>
                       </Box>
                       <Typography
@@ -254,6 +348,38 @@ Example:
               <Divider sx={{ mb: 3 }} />
               {result ? (
                 <Box>
+                  {/* Topic Information */}
+                  {result.topic_name && (
+                    <Box mb={3}>
+                      <Paper
+                        sx={{
+                          p: 2,
+                          bgcolor: 'info.light',
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: 'info.main',
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <TopicIcon sx={{ color: 'info.main' }} />
+                          <Box flex={1}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              Detected Topic
+                            </Typography>
+                            <Typography variant="h6" fontWeight={600} color="info.main">
+                              {result.topic_name}
+                            </Typography>
+                            {result.topic_confidence && (
+                              <Typography variant="caption" color="text.secondary">
+                                Confidence: {(result.topic_confidence * 100).toFixed(1)}%
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </Paper>
+                    </Box>
+                  )}
+
                   {/* Sentiment Badge */}
                   <Box mb={3} textAlign="center">
                     <motion.div

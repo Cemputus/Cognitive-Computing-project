@@ -46,12 +46,12 @@ const AppRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <Dashboard />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <Dashboard />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />
@@ -59,12 +59,12 @@ const AppRoutes = () => {
         path="/sentiment"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <SentimentAnalysis />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <SentimentAnalysis />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />
@@ -72,12 +72,12 @@ const AppRoutes = () => {
         path="/topics"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <TopicAnalysis />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <TopicAnalysis />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />
@@ -85,12 +85,12 @@ const AppRoutes = () => {
         path="/trends"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <TrendsInsights />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <TrendsInsights />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />
@@ -109,12 +109,12 @@ const AppRoutes = () => {
         path="/profile"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <Profile />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <Profile />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />
@@ -122,12 +122,12 @@ const AppRoutes = () => {
         path="/notifications"
         element={
           <ProtectedRoute>
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Navbar />
-              <Box component="main" sx={{ pt: 8, pb: 4 }}>
-                <Notifications />
-              </Box>
+          <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', overflow: 'hidden' }}>
+            <Navbar />
+            <Box component="main" sx={{ pt: 8, pb: 4, minHeight: 'calc(100vh - 64px)' }}>
+              <Notifications />
             </Box>
+          </Box>
           </ProtectedRoute>
         }
       />

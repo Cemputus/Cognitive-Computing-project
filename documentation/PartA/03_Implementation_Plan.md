@@ -1,19 +1,18 @@
 # Task A3: Implementation Plan
 
-**Marks**: 10/30  
-**Status**: ✅ Complete
-
 ---
 
 ## 1. Project Overview
 
 ### 1.1 Project Information
+
 - **Project Name**: Small Business Intelligence Analyst
 - **Duration**: 2 weeks (December 2025)
 - **Team Size**: Individual project
 - **Technology Stack**: Python, Jupyter Notebooks, React, Flask/FastAPI
 
 ### 1.2 Project Objectives
+
 1. Build a cognitive system for business intelligence
 2. Implement sentiment analysis and topic modeling
 3. Create interactive web interface
@@ -25,6 +24,7 @@
 ## 2. Work Breakdown Structure (WBS)
 
 ### Phase 1: Planning & Design (Days 1-2)
+
 - [ ] **1.1** Problem analysis document
   - Stakeholder analysis
   - User personas
@@ -39,6 +39,7 @@
   - Risk assessment
 
 ### Phase 2: Data Pipeline Development (Days 3-4)
+
 - [ ] **2.1** Data acquisition
   - Collect customer reviews
   - Gather social media data
@@ -52,6 +53,7 @@
   - Document preprocessing steps
 
 ### Phase 3: Cognitive Engine Development (Days 5-7)
+
 - [ ] **3.1** Understanding component
   - Sentiment analysis implementation
   - Entity extraction
@@ -67,6 +69,7 @@
   - Model training and validation
 
 ### Phase 4: Interactive Prototype (Days 8-9)
+
 - [ ] **4.1** Cognitive agent development
   - Integrate all components
   - Create agent class
@@ -83,6 +86,7 @@
   - Demo preparation
 
 ### Phase 5: Evaluation & Documentation (Days 10-12)
+
 - [ ] **5.1** System evaluation
   - Performance metrics
   - Baseline comparison
@@ -96,6 +100,7 @@
   - Generate evaluation report
 
 ### Phase 6: Final Documentation (Days 13-14)
+
 - [ ] **6.1** Final report writing
   - Comprehensive project documentation
   - Technical details
@@ -114,36 +119,38 @@
 
 ### Week 1: Development Phase
 
-| Day | Milestone | Tasks | Deliverables |
-|-----|-----------|-------|--------------|
-| **Day 1** | Planning | Problem analysis, Architecture design | Problem doc, Architecture diagrams |
-| **Day 2** | Planning | Implementation plan, Setup environment | Implementation plan, Project setup |
-| **Day 3** | Milestone 1 | Data acquisition, Preprocessing | Data pipeline notebook |
-| **Day 4** | Milestone 1 | Complete data pipeline | Processed datasets |
-| **Day 5** | Milestone 2 | Sentiment analysis implementation | Sentiment models |
-| **Day 6** | Milestone 2 | Topic modeling, Knowledge graphs | Topic models, Knowledge graph |
-| **Day 7** | Milestone 2 | Complete understanding engine | Milestone 2 notebook |
+| Day             | Milestone   | Tasks                                  | Deliverables                       |
+| --------------- | ----------- | -------------------------------------- | ---------------------------------- |
+| **Day 1** | Planning    | Problem analysis, Architecture design  | Problem doc, Architecture diagrams |
+| **Day 2** | Planning    | Implementation plan, Setup environment | Implementation plan, Project setup |
+| **Day 3** | Milestone 1 | Data acquisition, Preprocessing        | Data pipeline notebook             |
+| **Day 4** | Milestone 1 | Complete data pipeline                 | Processed datasets                 |
+| **Day 5** | Milestone 2 | Sentiment analysis implementation      | Sentiment models                   |
+| **Day 6** | Milestone 2 | Topic modeling, Knowledge graphs       | Topic models, Knowledge graph      |
+| **Day 7** | Milestone 2 | Complete understanding engine          | Milestone 2 notebook               |
 
 ### Week 2: Integration & Documentation
 
-| Day | Milestone | Tasks | Deliverables |
-|-----|-----------|-------|--------------|
-| **Day 8** | Milestone 3 | Cognitive agent, Integration | Integrated system |
-| **Day 9** | Milestone 3 | Web interface, Testing | Working prototype |
-| **Day 10** | Milestone 4 | Performance evaluation | Evaluation metrics |
-| **Day 11** | Milestone 4 | Ethical analysis | Ethics report |
-| **Day 12** | Milestone 5 | Final report writing | Project report |
-| **Day 13** | Milestone 5 | Presentation preparation | Slides, Demo |
-| **Day 14** | Submission | Final review, Submission | All deliverables |
+| Day              | Milestone   | Tasks                        | Deliverables       |
+| ---------------- | ----------- | ---------------------------- | ------------------ |
+| **Day 8**  | Milestone 3 | Cognitive agent, Integration | Integrated system  |
+| **Day 9**  | Milestone 3 | Web interface, Testing       | Working prototype  |
+| **Day 10** | Milestone 4 | Performance evaluation       | Evaluation metrics |
+| **Day 11** | Milestone 4 | Ethical analysis             | Ethics report      |
+| **Day 12** | Milestone 5 | Final report writing         | Project report     |
+| **Day 13** | Milestone 5 | Presentation preparation     | Slides, Demo       |
+| **Day 14** | Submission  | Final review, Submission     | All deliverables   |
 
 ---
 
 ## 4. Detailed Task Schedule
 
 ### Days 1-2: Planning Phase
+
 **Goal**: Complete Part A documentation
 
 **Tasks:**
+
 - [ ] Write problem analysis document (4-6 hours)
 - [ ] Create system architecture diagrams (3-4 hours)
 - [ ] Develop implementation plan (2-3 hours)
@@ -151,14 +158,17 @@
 - [ ] Install dependencies (30 minutes)
 
 **Deliverables:**
+
 - Problem analysis document
 - Architecture diagrams
 - Implementation plan
 
 ### Days 3-4: Data Pipeline
+
 **Goal**: Complete Milestone 1
 
 **Tasks:**
+
 - [ ] Collect/generate sample data (2 hours)
 - [ ] Implement text preprocessing (3-4 hours)
 - [ ] Create data quality analysis (2 hours)
@@ -166,14 +176,17 @@
 - [ ] Document data sources (1 hour)
 
 **Deliverables:**
+
 - Data pipeline notebook
 - Processed datasets
 - Preprocessing documentation
 
 ### Days 5-7: Cognitive Engine
+
 **Goal**: Complete Milestone 2
 
 **Tasks:**
+
 - [ ] Implement sentiment analysis (4-5 hours)
 - [ ] Build topic modeling (4-5 hours)
 - [ ] Create knowledge graph (3-4 hours)
@@ -181,14 +194,17 @@
 - [ ] Complete understanding engine notebook (3-4 hours)
 
 **Deliverables:**
+
 - Understanding & reasoning notebook
 - Trained models
 - Knowledge graph
 
 ### Days 8-9: Interactive Prototype
+
 **Goal**: Complete Milestone 3
 
 **Tasks:**
+
 - [ ] Create cognitive agent class (3-4 hours)
 - [ ] Integrate all components (3-4 hours)
 - [ ] Enhance Streamlit app (4-5 hours)
@@ -196,14 +212,17 @@
 - [ ] Complete prototype notebook (2 hours)
 
 **Deliverables:**
+
 - Working web application
 - Interactive prototype notebook
 - Demo ready system
 
 ### Days 10-11: Evaluation
+
 **Goal**: Complete Milestone 4
 
 **Tasks:**
+
 - [ ] Performance evaluation (4-5 hours)
 - [ ] Baseline comparison (2-3 hours)
 - [ ] Ethical analysis (3-4 hours)
@@ -211,14 +230,17 @@
 - [ ] Complete evaluation notebook (2 hours)
 
 **Deliverables:**
+
 - Evaluation report
 - Ethical analysis document
 - Evaluation notebook
 
 ### Days 12-14: Final Documentation
+
 **Goal**: Complete Milestone 5
 
 **Tasks:**
+
 - [ ] Write final project report (6-8 hours)
 - [ ] Create presentation slides (4-5 hours)
 - [ ] Prepare user manual (2-3 hours)
@@ -226,6 +248,7 @@
 - [ ] Practice presentation (2-3 hours)
 
 **Deliverables:**
+
 - Final project report
 - Presentation slides
 - User manual
@@ -238,16 +261,18 @@
 ### 5.1 Technical Risks
 
 #### Risk 1: Data Availability
+
 - **Probability**: Medium
 - **Impact**: High
 - **Description**: Difficulty obtaining real customer reviews and social media data
-- **Mitigation**: 
+- **Mitigation**:
   - Use sample data generation
   - Scrape public data (with permission)
   - Create synthetic datasets
   - Use available public datasets
 
 #### Risk 2: Model Performance
+
 - **Probability**: Medium
 - **Impact**: Medium
 - **Description**: Models may not perform well on Ugandan context data
@@ -258,6 +283,7 @@
   - Focus on demonstration over perfection
 
 #### Risk 3: Technical Complexity
+
 - **Probability**: Low
 - **Impact**: High
 - **Description**: Integration of multiple components may be complex
@@ -270,6 +296,7 @@
 ### 5.2 Data Risks
 
 #### Risk 4: Data Quality
+
 - **Probability**: Medium
 - **Impact**: Medium
 - **Description**: Raw data may be noisy or incomplete
@@ -280,6 +307,7 @@
   - Document data limitations
 
 #### Risk 5: Language Support
+
 - **Probability**: High
 - **Impact**: Medium
 - **Description**: Limited support for Luganda language
@@ -292,6 +320,7 @@
 ### 5.3 Time Risks
 
 #### Risk 6: Time Constraints
+
 - **Probability**: High
 - **Impact**: High
 - **Description**: 2 weeks may not be enough for all features
@@ -302,6 +331,7 @@
   - Document future enhancements
 
 #### Risk 7: Scope Creep
+
 - **Probability**: Medium
 - **Impact**: Medium
 - **Description**: Adding too many features
@@ -313,6 +343,7 @@
 ### 5.4 Resource Risks
 
 #### Risk 8: Computing Resources
+
 - **Probability**: Low
 - **Impact**: Low
 - **Description**: Limited computational power for training
@@ -323,6 +354,7 @@
   - Focus on efficient algorithms
 
 #### Risk 9: React Development Complexity
+
 - **Probability**: Medium
 - **Impact**: Medium
 - **Description**: React development may take longer than expected
@@ -338,18 +370,21 @@
 ## 6. Success Criteria
 
 ### 6.1 Technical Success
+
 - [ ] All 5 milestones completed
 - [ ] System demonstrates all 4 cognitive pillars
 - [ ] Working interactive prototype
 - [ ] Models perform reasonably well
 
 ### 6.2 Documentation Success
+
 - [ ] Complete Part A documentation
 - [ ] Comprehensive Part C evaluation
 - [ ] Professional final report
 - [ ] Clear presentation
 
 ### 6.3 Academic Success
+
 - [ ] Demonstrates understanding of cognitive computing
 - [ ] Shows application of theoretical concepts
 - [ ] Addresses Ugandan context appropriately
@@ -360,11 +395,13 @@
 ## 7. Resource Requirements
 
 ### 7.1 Hardware
+
 - Computer with Python 3.8+
 - Minimum 4GB RAM (8GB recommended)
 - Internet connection for data and libraries
 
 ### 7.2 Software
+
 - Python 3.8+
 - Jupyter Notebook
 - Git (for version control)
@@ -372,11 +409,13 @@
 - Diagramming tool (Draw.io, etc.)
 
 ### 7.3 Data
+
 - Customer review datasets
 - Social media data
 - Market/business news data
 
 ### 7.4 Knowledge
+
 - Python programming
 - NLP basics
 - Machine learning fundamentals
@@ -387,18 +426,21 @@
 ## 8. Quality Assurance
 
 ### 8.1 Code Quality
+
 - [ ] Code is well-commented
 - [ ] Functions are modular
 - [ ] Error handling implemented
 - [ ] Code follows PEP 8 style
 
 ### 8.2 Documentation Quality
+
 - [ ] All sections completed
 - [ ] Clear and professional writing
 - [ ] Proper citations
 - [ ] Visual aids (diagrams, charts)
 
 ### 8.3 Testing
+
 - [ ] Each component tested individually
 - [ ] Integration testing completed
 - [ ] User testing (if possible)
@@ -409,11 +451,13 @@
 ## 9. Communication Plan
 
 ### 9.1 Progress Tracking
+
 - Daily progress updates (self-tracking)
 - Milestone completion checkpoints
 - GitHub commits for version control
 
 ### 9.2 Documentation Updates
+
 - Update documentation as you develop
 - Don't leave documentation to the end
 - Keep notes during development
@@ -423,18 +467,21 @@
 ## 10. Contingency Plans
 
 ### 10.1 If Behind Schedule
+
 - Prioritize core features
 - Simplify non-essential components
 - Focus on demonstrating cognitive principles
 - Document what would be done with more time
 
 ### 10.2 If Technical Issues
+
 - Use simpler implementations
 - Leverage pre-built libraries
 - Focus on working prototype over perfection
 - Document limitations
 
 ### 10.3 If Data Issues
+
 - Use synthetic/sample data
 - Focus on methodology over data size
 - Document data limitations
@@ -445,12 +492,14 @@
 ## 11. Milestone Deliverables Checklist
 
 ### Milestone 1: System Blueprint & Data Pipeline
+
 - [ ] Problem analysis document
 - [ ] Architecture diagrams
 - [ ] Data pipeline notebook
 - [ ] Processed datasets
 
 ### Milestone 2: Understanding Engine
+
 - [ ] Sentiment analysis implementation
 - [ ] Topic modeling implementation
 - [ ] Knowledge graph
@@ -458,12 +507,14 @@
 - [ ] Milestone 2 notebook
 
 ### Milestone 3: Interactive Prototype
+
 - [ ] Cognitive agent class
 - [ ] Working web application
 - [ ] Integration of all components
 - [ ] Milestone 3 notebook
 
 ### Milestone 4: Evaluation & Ethical Review
+
 - [ ] Performance evaluation
 - [ ] Baseline comparison
 - [ ] Ethical analysis document
@@ -471,6 +522,7 @@
 - [ ] Milestone 4 notebook
 
 ### Milestone 5: Final Documentation
+
 - [ ] Final project report
 - [ ] Presentation slides
 - [ ] User manual
@@ -489,6 +541,7 @@
 - Buffer time
 
 **Tools for timeline:**
+
 - Microsoft Project
 - Excel/Google Sheets
 - Online Gantt chart tools
@@ -497,4 +550,3 @@
 ---
 
 **Note**: This is a template. Customize the timeline based on your actual schedule and fill in all sections with specific details. Update the plan as you progress through the project.
-

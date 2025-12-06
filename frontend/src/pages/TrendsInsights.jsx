@@ -15,6 +15,10 @@ import {
   Tabs,
   Tab,
   Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import {
   LineChart,
@@ -48,27 +52,43 @@ const TrendsInsights = () => {
   const [error, setError] = useState(null)
   const [tabValue, setTabValue] = useState(0)
   const [chartType, setChartType] = useState('line')
+  const [forecastPeriod, setForecastPeriod] = useState('7')
 
   useEffect(() => {
     fetchForecast()
-  }, [])
+  }, [forecastPeriod])
 
   const fetchForecast = async () => {
     try {
       setLoading(true)
-      const data = await apiService.getForecast()
+      const data = await apiService.getForecast(forecastPeriod)
       if (data && (data.forecast_dates || data.forecast)) {
         setForecast(data)
         setError(null)
+      } else if (data && data.error) {
+        // Handle user-friendly error message from backend
+        const errorMsg = data.message || data.error
+        setError(errorMsg)
       } else {
-        setError('Forecast data not available. Please run the predictive modeling notebook.')
+        setError('Forecast data is not yet available. The predictive analytics are still being processed.')
       }
     } catch (err) {
       console.error('Forecast error:', err)
-      setError(err.message || 'Failed to load forecast data. Please ensure the backend is running and forecast data exists.')
+      // Handle error response with user-friendly message
+      if (err.response && err.response.data) {
+        const errorData = err.response.data
+        const errorMsg = errorData.message || errorData.error || 'Unable to load forecast data at this time.'
+        setError(errorMsg)
+      } else {
+        setError('Unable to load forecast data. Please try again later.')
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  const handlePeriodChange = (event) => {
+    setForecastPeriod(event.target.value)
   }
 
   const handleExport = () => {
@@ -144,7 +164,23 @@ const TrendsInsights = () => {
             Predictive insights and sentiment trend forecasting powered by advanced ML models
           </Typography>
         </Box>
-        <Box display="flex" gap={1}>
+        <Box display="flex" gap={2} alignItems="center">
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="forecast-period-label">Forecast Period</InputLabel>
+            <Select
+              labelId="forecast-period-label"
+              id="forecast-period-select"
+              value={forecastPeriod}
+              label="Forecast Period"
+              onChange={handlePeriodChange}
+            >
+              <MenuItem value="7">7 Days</MenuItem>
+              <MenuItem value="30">30 Days</MenuItem>
+              <MenuItem value="months">Months (Last Year)</MenuItem>
+              <MenuItem value="years">Years (All Data)</MenuItem>
+              <MenuItem value="overall">Overall (All Data)</MenuItem>
+            </Select>
+          </FormControl>
           <Tooltip title="Refresh Data">
             <IconButton onClick={fetchForecast} color="primary">
               <Refresh />
@@ -313,7 +349,13 @@ const TrendsInsights = () => {
                     sx={{ fontSize: '0.875rem', fontWeight: 600 }}
                   />
                   <Chip
-                    label={`Forecast Period: ${chartData.length} days`}
+                    label={`Forecast Period: ${
+                      forecastPeriod === 'overall' ? 'Overall' :
+                      forecastPeriod === 'months' ? 'Last 12 Months' :
+                      forecastPeriod === 'years' ? 'All Years' :
+                      forecastPeriod === '30' ? '30 Days' :
+                      '7 Days'
+                    } (${chartData.length} data points)`}
                     variant="outlined"
                     sx={{ fontSize: '0.875rem' }}
                   />
@@ -613,12 +655,30 @@ const TrendsInsights = () => {
             <Box textAlign="center" py={6}>
               <ShowChart sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" color="text.secondary" gutterBottom>
-                Forecast Data Not Available
+                {error ? 'Forecast Data Not Available' : 'Loading Forecast Data...'}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mt: 1 }}>
-                To generate forecast data, please run the predictive modeling notebook (Milestone 2) 
-                which will create forecast results using Moving Average, Linear Trend, and ARIMA models.
-              </Typography>
+              {error ? (
+                <Box sx={{ maxWidth: 600, mx: 'auto', mt: 2 }}>
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                      Forecast Data Not Available
+                    </Typography>
+                    <Typography variant="body2">
+                      {error}
+                    </Typography>
+                  </Alert>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                    Predictive analytics will appear here once the analysis is complete.
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mt: 1 }}>
+                    Loading forecast data from Milestone 2 output...
+                  </Typography>
+                  <CircularProgress sx={{ mt: 3 }} />
+                </>
+              )}
             </Box>
           </CardContent>
         </Card>

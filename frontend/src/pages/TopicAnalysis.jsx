@@ -47,11 +47,30 @@ const TopicAnalysis = () => {
   const fetchTopics = async () => {
     try {
       setLoading(true)
-      const data = await apiService.getTopics()
-      setTopics(data)
       setError(null)
+      const data = await apiService.getTopics()
+      
+      // Handle both array and object responses
+      if (Array.isArray(data)) {
+        setTopics(data)
+      } else if (data && Array.isArray(data.topics)) {
+        setTopics(data.topics)
+      } else if (data && data.error) {
+        setError(data.error)
+        setTopics([])
+      } else {
+        setTopics([])
+      }
     } catch (err) {
-      setError(err.message || 'Failed to load topics')
+      console.error('Error fetching topics:', err)
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to load topics'
+      setError(errorMessage)
+      // If error response has topics, still show them
+      if (err.response?.data?.topics && Array.isArray(err.response.data.topics)) {
+        setTopics(err.response.data.topics)
+      } else {
+        setTopics([])
+      }
     } finally {
       setLoading(false)
     }
@@ -92,8 +111,8 @@ const TopicAnalysis = () => {
         </IconButton>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+      {error && topics.length === 0 && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
@@ -101,9 +120,14 @@ const TopicAnalysis = () => {
       {topics.length === 0 && !loading && (
         <Card>
           <CardContent>
-            <Typography variant="body1" color="text.secondary" textAlign="center" py={4}>
-              No topics available. Run Milestone 2 notebook to generate topic models.
-            </Typography>
+            <Box textAlign="center" py={4}>
+              <Typography variant="h6" color="text.secondary" gutterBottom>
+                No Topics Available
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Topic models are being generated. Please check back shortly or ensure Milestone 2 notebook has been run.
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
       )}

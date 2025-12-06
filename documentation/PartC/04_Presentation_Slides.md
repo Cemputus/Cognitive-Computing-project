@@ -370,7 +370,7 @@ Thank you for your attention!
 
 **Contact:**
 
-- Project Repository: [GitHub Link]
+- Project Repository: [https://github.com/Cemputus/Cognitive-Computing-project]
 - Documentation: `docs/` folder
 - Demo: Available for testing
 

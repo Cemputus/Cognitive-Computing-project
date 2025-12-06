@@ -229,9 +229,50 @@ const Dashboard = () => {
   }
 
   if (error && !stats) {
+    const isNetworkError = error.toLowerCase().includes('network') || 
+                          error.toLowerCase().includes('cannot connect') ||
+                          error.toLowerCase().includes('no response')
+    
     return (
-      <Container>
-        <Alert severity="error">{error}</Alert>
+      <Container sx={{ mt: 4 }}>
+        <Alert 
+          severity="error" 
+          sx={{ mb: 2 }}
+          action={
+            <IconButton
+              color="inherit"
+              size="small"
+              onClick={() => fetchAllData(true)}
+            >
+              <Refresh />
+            </IconButton>
+          }
+        >
+          {error}
+        </Alert>
+        {isNetworkError && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+              Troubleshooting Steps:
+            </Typography>
+            <Typography variant="body2" component="div">
+              1. Make sure the backend server is running on port 5000
+              <br />
+              2. Check the backend terminal for any error messages
+              <br />
+              3. Verify you are logged in (check if you have a valid token)
+              <br />
+              4. Try refreshing the page or clicking the refresh button above
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 2, fontWeight: 'bold' }}>
+              To start the backend:
+            </Typography>
+            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', mt: 1, p: 1, bgcolor: '#f1f5f9', borderRadius: 1, color: '#1a202c', border: '1px solid #e2e8f0' }}>
+              cd backend<br />
+              python backend_api.py
+            </Typography>
+          </Alert>
+        )}
       </Container>
     )
   }
@@ -373,14 +414,14 @@ const Dashboard = () => {
   })) || []
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ pb: 3 }}>
       {/* Header */}
       <Box mb={4} display="flex" justifyContent="space-between" alignItems="center">
         <Box>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight={700} sx={{ color: '#1a202c' }}>
             Analytics Dashboard
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" sx={{ color: '#4a5568' }}>
             Comprehensive business intelligence insights and sentiment analysis
           </Typography>
         </Box>
@@ -410,12 +451,14 @@ const Dashboard = () => {
               <Card
                 sx={{
                   height: '100%',
-                  background: `linear-gradient(135deg, ${stat.color}15 0%, ${stat.color}05 100%)`,
-                  border: `1px solid ${stat.color}30`,
+                  background: `linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)`,
+                  border: `2px solid ${stat.color}20`,
                   transition: 'transform 0.2s, box-shadow 0.2s',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.07)',
                   '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: `0 8px 24px ${stat.color}40`,
+                    boxShadow: `0 12px 28px ${stat.color}30`,
+                    borderColor: stat.color,
                   },
                 }}
               >
@@ -454,7 +497,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* Location-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box display="flex" alignItems="center" gap={2}>
@@ -507,7 +550,7 @@ const Dashboard = () => {
                     <YAxis tick={{ fontSize: 12 }} />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        backgroundColor: '#ffffff',
                         border: '1px solid #e5e7eb',
                         borderRadius: 8,
                       }}
@@ -567,12 +610,12 @@ const Dashboard = () => {
             <Box mt={2}>
               <Box display="flex" gap={2} flexWrap="wrap" mb={1}>
                 <Chip
-                  label={`Total Locations: ${locationData.summary.total_locations}`}
+                  label={`Total Locations: ${locationData.summary?.total_locations || 0}`}
                   color="primary"
                   variant="outlined"
                 />
                 <Chip
-                  label={`Total Reviews: ${locationData.summary.total_reviews.toLocaleString()}`}
+                  label={`Total Reviews: ${locationData.summary?.total_reviews?.toLocaleString() || 0}`}
                   color="primary"
                   variant="outlined"
                 />
@@ -595,7 +638,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Platform-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box display="flex" alignItems="center" gap={2}>
@@ -635,7 +678,7 @@ const Dashboard = () => {
                     <YAxis tick={{ fontSize: 12 }} />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        backgroundColor: '#ffffff',
                         border: '1px solid #e5e7eb',
                         borderRadius: 8,
                       }}
@@ -697,12 +740,12 @@ const Dashboard = () => {
             <Box mt={2}>
               <Box display="flex" gap={2} flexWrap="wrap" mb={1}>
                 <Chip
-                  label={`Total Platforms: ${platformData.summary.total_platforms}`}
+                  label={`Total Platforms: ${platformData.summary?.total_platforms || 0}`}
                   color="primary"
                   variant="outlined"
                 />
                 <Chip
-                  label={`Total Reviews: ${platformData.summary.total_reviews.toLocaleString()}`}
+                  label={`Total Reviews: ${platformData.summary?.total_reviews?.toLocaleString() || 0}`}
                   color="primary"
                   variant="outlined"
                 />
@@ -725,7 +768,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Topic-Based Sentiment Analysis */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4, bgcolor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.07)' }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box display="flex" alignItems="center" gap={2}>
@@ -797,12 +840,12 @@ const Dashboard = () => {
             <Box mt={2}>
               <Box display="flex" gap={2} flexWrap="wrap" mb={1}>
                 <Chip
-                  label={`Total Topics: ${topicData.summary.total_topics}`}
+                  label={`Total Topics: ${topicData.summary?.total_topics || 0}`}
                   color="primary"
                   variant="outlined"
                 />
                 <Chip
-                  label={`Total Reviews: ${topicData.summary.total_reviews.toLocaleString()}`}
+                  label={`Total Reviews: ${topicData.summary?.total_reviews?.toLocaleString() || 0}`}
                   color="primary"
                   variant="outlined"
                 />
@@ -814,7 +857,7 @@ const Dashboard = () => {
                   />
                 )}
               </Box>
-              {topicFilter !== 'all' && topicData.summary[`total_${topicFilter}`] > 0 && (
+              {topicFilter !== 'all' && topicData.summary?.[`total_${topicFilter}`] > 0 && (
                 <Typography variant="body2" color="text.secondary" mt={1}>
                   <strong>Distribution:</strong> Showing what percentage of all {topicFilter} reviews come from each topic.
                 </Typography>

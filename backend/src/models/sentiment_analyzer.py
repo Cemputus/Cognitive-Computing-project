@@ -249,9 +249,41 @@ class SentimentAnalyzer:
             scores = {'polarity': polarity, 'subjectivity': subjectivity}
             confidence = self._calculate_confidence(scores, 'textblob')
             
+            # Convert polarity to pos/neu/neg format (similar to VADER)
+            # Polarity ranges from -1 (negative) to +1 (positive)
+            if polarity > 0:
+                pos = abs(polarity)
+                neg = 0.0
+                neu = 1.0 - pos
+            elif polarity < 0:
+                neg = abs(polarity)
+                pos = 0.0
+                neu = 1.0 - neg
+            else:
+                pos = 0.0
+                neg = 0.0
+                neu = 1.0
+            
+            # Ensure values are within 0-1 range and sum to ~1
+            total = pos + neu + neg
+            if total > 0:
+                pos = pos / total
+                neu = neu / total
+                neg = neg / total
+            
+            # Use polarity as compound score (normalized to -1 to 1 range)
+            compound = max(-1.0, min(1.0, polarity))
+            
             result = {
                 'polarity': polarity,
                 'subjectivity': subjectivity,
+                'compound': compound,
+                'pos': pos,
+                'neu': neu,
+                'neg': neg,
+                'positive': pos,
+                'neutral': neu,
+                'negative': neg,
                 'sentiment': sentiment,
                 'confidence': confidence,
                 'word_count': len(text.split())
@@ -267,6 +299,13 @@ class SentimentAnalyzer:
             return {
                 'polarity': 0.0,
                 'subjectivity': 0.0,
+                'compound': 0.0,
+                'pos': 0.0,
+                'neu': 1.0,
+                'neg': 0.0,
+                'positive': 0.0,
+                'neutral': 1.0,
+                'negative': 0.0,
                 'sentiment': 'neutral',
                 'confidence': 0.0,
                 'error': str(e),
@@ -276,10 +315,30 @@ class SentimentAnalyzer:
     def analyze_transformer(self, text):
         """Analyze sentiment using transformer model with enhanced robustness"""
         if not self.transformer_available:
-            raise ValueError("Transformer analyzer not available")
+            # Return error result instead of raising exception
+            return {
+                'compound': 0.0,
+                'pos': 0.0,
+                'neu': 1.0,
+                'neg': 0.0,
+                'positive': 0.0,
+                'neutral': 1.0,
+                'negative': 0.0,
+                'sentiment': 'neutral',
+                'confidence': 0.0,
+                'error': 'Transformer analyzer not available',
+                'warning': 'Transformer model is not available. Please use VADER, TextBlob, or Ensemble method instead.'
+            }
         
         if not text or len(text.strip()) == 0:
             return {
+                'compound': 0.0,
+                'pos': 0.0,
+                'neu': 1.0,
+                'neg': 0.0,
+                'positive': 0.0,
+                'neutral': 1.0,
+                'negative': 0.0,
                 'sentiment': 'neutral',
                 'confidence': 0.0,
                 'warning': 'Empty text input'
@@ -314,9 +373,39 @@ class SentimentAnalyzer:
             sentiment = sentiment_map.get(label, 'neutral')
             confidence = score  # Transformer score is already a confidence
             
+            # Convert to pos/neu/neg format based on sentiment
+            if sentiment == 'positive':
+                pos = score
+                neg = 0.0
+                neu = 1.0 - score
+                compound = score  # Positive sentiment -> positive compound
+            elif sentiment == 'negative':
+                pos = 0.0
+                neg = score
+                neu = 1.0 - score
+                compound = -score  # Negative sentiment -> negative compound
+            else:  # neutral
+                pos = 0.0
+                neg = 0.0
+                neu = score
+                compound = 0.0
+            
+            # Ensure values are within 0-1 range
+            pos = max(0.0, min(1.0, pos))
+            neu = max(0.0, min(1.0, neu))
+            neg = max(0.0, min(1.0, neg))
+            compound = max(-1.0, min(1.0, compound))
+            
             return {
                 'label': label,
                 'score': score,
+                'compound': compound,
+                'pos': pos,
+                'neu': neu,
+                'neg': neg,
+                'positive': pos,
+                'neutral': neu,
+                'negative': neg,
                 'sentiment': sentiment,
                 'confidence': confidence,
                 'word_count': len(text.split())
@@ -324,6 +413,13 @@ class SentimentAnalyzer:
             
         except Exception as e:
             return {
+                'compound': 0.0,
+                'pos': 0.0,
+                'neu': 1.0,
+                'neg': 0.0,
+                'positive': 0.0,
+                'neutral': 1.0,
+                'negative': 0.0,
                 'sentiment': 'neutral',
                 'confidence': 0.0,
                 'error': str(e),
@@ -373,6 +469,13 @@ class SentimentAnalyzer:
             return {
                 'sentiment': 'neutral',
                 'confidence': 0.0,
+                'compound': 0.0,
+                'pos': 0.0,
+                'neu': 1.0,
+                'neg': 0.0,
+                'positive': 0.0,
+                'neutral': 1.0,
+                'negative': 0.0,
                 'error': 'No sentiment analyzers available',
                 'warning': 'Unable to analyze sentiment'
             }
@@ -397,21 +500,35 @@ class SentimentAnalyzer:
         final_sentiment = max(sentiment_votes, key=sentiment_votes.get)
         final_confidence = total_confidence
         
-        # Aggregate scores
+        # Aggregate scores (pos, neu, neg, compound)
         compound_scores = [r.get('compound', 0) for r in results if 'compound' in r]
+        pos_scores = [r.get('pos', r.get('positive', 0)) for r in results]
+        neu_scores = [r.get('neu', r.get('neutral', 0)) for r in results]
+        neg_scores = [r.get('neg', r.get('negative', 0)) for r in results]
         polarity_scores = [r.get('polarity', 0) for r in results if 'polarity' in r]
+        
+        # Weighted average of scores
+        weighted_pos = sum(pos_scores[i] * weights[i] for i in range(len(pos_scores)))
+        weighted_neu = sum(neu_scores[i] * weights[i] for i in range(len(neu_scores)))
+        weighted_neg = sum(neg_scores[i] * weights[i] for i in range(len(neg_scores)))
+        weighted_compound = np.mean(compound_scores) if compound_scores else 0.0
         
         ensemble_result = {
             'sentiment': final_sentiment,
             'confidence': final_confidence,
+            'compound': weighted_compound,
+            'pos': weighted_pos,
+            'neu': weighted_neu,
+            'neg': weighted_neg,
+            'positive': weighted_pos,
+            'neutral': weighted_neu,
+            'negative': weighted_neg,
             'method': 'ensemble',
             'methods_used': len(results),
             'word_count': len(text.split()) if text else 0
         }
         
         # Add aggregated scores
-        if compound_scores:
-            ensemble_result['compound'] = np.mean(compound_scores)
         if polarity_scores:
             ensemble_result['polarity'] = np.mean(polarity_scores)
         
@@ -461,10 +578,27 @@ class SentimentAnalyzer:
         
         # Use single method
         if self.method == 'vader':
+            if not self.vader_available:
+                # Fallback to TextBlob if VADER not available
+                print("⚠️  VADER not available, falling back to TextBlob")
+                return self.analyze_textblob(text)
             return self.analyze_vader(text)
         elif self.method == 'textblob':
             return self.analyze_textblob(text)
         elif self.method == 'transformer':
+            if not self.transformer_available:
+                # Fallback to VADER if transformer not available
+                print("⚠️  Transformer not available, falling back to VADER")
+                if self.vader_available:
+                    result = self.analyze_vader(text)
+                    result['warning'] = 'Transformer method not available. Results shown using VADER instead.'
+                    return result
+                else:
+                    # Fallback to TextBlob if VADER also not available
+                    print("⚠️  VADER also not available, falling back to TextBlob")
+                    result = self.analyze_textblob(text)
+                    result['warning'] = 'Transformer method not available. Results shown using TextBlob instead.'
+                    return result
             return self.analyze_transformer(text)
         else:
             # Fallback to ensemble
