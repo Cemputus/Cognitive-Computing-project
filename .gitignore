@@ -32,6 +32,7 @@ backend/data/models/*.pt
 # Environment variables
 .env
 .env.local
+.venv/
 
 # IDE
 .vscode/
