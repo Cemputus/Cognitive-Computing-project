@@ -1,37 +1,7 @@
 {
   "name": "business-intelligence-analyst",
   "version": "1.0.0",
-  "description": "Small Business Intelligence Analyst - React Frontend",
-  "private": true,
-  "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.0",
-    "@mui/material": "^5.15.0",
-    "axios": "^1.6.2",
-    "date-fns": "^2.30.0",
-    "react": "^18.2.0",
-    "react-d3-cloud": "^1.0.6",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "recharts": "^2.10.3",
-    "react-icons": "^4.12.0",
-    "framer-motion": "^10.16.16",
-    "jwt-decode": "^4.0.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  }
-}
-
-  "version": "1.0.0",
-  "description": "Small Business Intelligence Analyst - React Frontend",
+  "description": "Small Business Intelligence Analyst - CENAnalytics",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
